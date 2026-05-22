@@ -5,13 +5,17 @@ import { AuroraBackground } from "@/components/background/AuroraBackground";
 import { Logo } from "@/components/common/Logo";
 import { LiveLeadsTicker } from "@/components/landing/LiveLeadsTicker";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { CountUpString } from "@/components/common/CountUp";
+import { Reveal } from "@/components/common/Reveal";
 import { mockStats, mockFAQs, mockOfferwalls, mockSurveys } from "@/data/mock";
 import {
   ArrowRight, ChevronDown, Sparkles, ShieldCheck, Zap, Diamond,
   Users, Coins, Trophy, Wallet, Compass, CheckCircle2, Star,
   Gauge, Layers, Lock, Banknote, Bitcoin, Gift, Building2,
   UserPlus, MousePointerClick, Rocket, BadgeCheck, Eye, Headset, ScrollText,
+  Activity, Flame, TicketPercent, Users2, Award,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,31 +90,59 @@ function Landing() {
               #1 Rewards Platform of 2026
             </span>
             <h1 className="mt-5 font-display text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-              Earn premium <span className="text-gradient-xp">XP rewards</span> from offers, surveys, and tasks.
+              Earn premium{" "}
+              <span className="text-shimmer-xp">XP rewards</span>{" "}
+              from offers, surveys, and tasks.
             </h1>
-            <p className="mt-5 max-w-xl text-base md:text-lg text-muted-foreground">
-              Complete offers. Earn XP. Cash out. Join 240k+ members turning their time into PayPal cash, crypto, and gift cards on the premium GPT/CPA rewards platform.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <button onClick={() => open("signup")} className="inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition">
-                Start Earning Free <Sparkles className="h-4 w-4" />
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5 max-w-xl text-base md:text-lg text-muted-foreground"
+            >
+              Complete offers. <span className="text-shimmer-primary font-semibold">Earn XP.</span>{" "}
+              <span className="text-shimmer-primary font-semibold">Cash out.</span>{" "}
+              Join 240k+ members turning their time into PayPal cash, crypto, and gift{" "}
+              <span className="text-shimmer-xp font-semibold">Rewards</span> on the premium GPT/CPA platform.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-7 flex flex-wrap gap-3"
+            >
+              <button
+                onClick={() => open("signup")}
+                className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary animate-glow-soft hover:opacity-95 transition"
+              >
+                <span className="absolute inset-0 rounded-xl bg-[linear-gradient(115deg,transparent_35%,rgba(255,255,255,0.25)_50%,transparent_65%)] translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative">Start Earning Free</span>
+                <Sparkles className="relative h-4 w-4" />
               </button>
               <a href="#how" className="inline-flex items-center gap-2 rounded-xl glass px-5 py-3 text-sm font-semibold hover:bg-card transition">
                 How It Works
               </a>
-            </div>
+            </motion.div>
             <div className="mt-7 flex flex-wrap gap-2">
               {[
                 { icon: CheckCircle2, label: "100% Free" },
                 { icon: Zap, label: "Instant XP" },
                 { icon: ShieldCheck, label: "Secure & Trusted" },
                 { icon: Star, label: "4.8 / 5 rating" },
-              ].map((t) => (
-                <span key={t.label} className="inline-flex items-center gap-1.5 rounded-full bg-card/60 backdrop-blur border border-border px-3 py-1.5 text-xs text-muted-foreground">
+              ].map((t, i) => (
+                <motion.span
+                  key={t.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.08, duration: 0.5 }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-card/60 backdrop-blur border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition animate-float-slow"
+                  style={{ animationDelay: `${i * 0.4}s` }}
+                >
                   <t.icon className="h-3.5 w-3.5 text-success" /> {t.label}
-                </span>
+                </motion.span>
               ))}
             </div>
+
           </div>
 
           {/* Right visual */}
