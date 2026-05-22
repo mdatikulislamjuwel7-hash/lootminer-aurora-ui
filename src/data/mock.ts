@@ -250,7 +250,7 @@ export const mockLevels = Array.from({ length: 15 }, (_, i) => ({
   level: i + 1,
   requiredXp: (i + 1) * 1000 + i * i * 200,
   bonusXp: 100 + i * 50,
-  badge: ["Starter", "Miner", "Explorer", "Hunter", "Diamond", "Master", "Legend"][i % 7],
+  badge: ["Starter", "Earner", "Explorer", "Hunter", "Diamond", "Master", "Legend"][i % 7],
 }));
 export const mockSettings = {
   xpPerUsd: 1000,
