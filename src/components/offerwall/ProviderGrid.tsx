@@ -1,11 +1,21 @@
-import { providers } from "@/data/mock";
+import { useState } from "react";
 import { ProviderCard } from "./ProviderCard";
+import { IframeOverlay } from "@/components/common/IframeOverlay";
+import type { Provider } from "@/data/mock";
 
-export function ProviderGrid({ limit }: { limit?: number }) {
-  const list = limit ? providers.slice(0, limit) : providers;
+export function ProviderGrid({ items }: { items: Provider[] }) {
+  const [open, setOpen] = useState<Provider | null>(null);
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-      {list.map(p => <ProviderCard key={p.id} p={p} />)}
-    </div>
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
+        {items.map((p) => <ProviderCard key={p.id} p={p} onOpen={setOpen} />)}
+      </div>
+      <IframeOverlay
+        open={!!open}
+        url={open?.iframeUrl ?? ""}
+        title={open?.name ?? ""}
+        onClose={() => setOpen(null)}
+      />
+    </>
   );
 }
