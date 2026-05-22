@@ -4,9 +4,9 @@ import { NavDrawer } from "./NavDrawer";
 
 const items = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/earn", label: "Earn", icon: Sparkles },
-  { to: "/cashout", label: "Cashout", icon: Wallet },
-  { to: "/rewards", label: "Rewards", icon: Trophy },
+  { to: "/earn", label: "Earn", icon: Sparkles, exact: false },
+  { to: "/cashout", label: "Cashout", icon: Wallet, exact: false },
+  { to: "/rewards", label: "Rewards", icon: Trophy, exact: false },
 ] as const;
 
 export function MobileBottomNav() {
