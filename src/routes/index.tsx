@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { PageHeader } from "@/components/common/PageHeader";
+
 import { ProviderGrid } from "@/components/offerwall/ProviderGrid";
 import { user, activity } from "@/data/mock";
 import { ArrowUpRight, Coins, Flame, Sparkles, TrendingUp, Trophy, Wallet } from "lucide-react";
