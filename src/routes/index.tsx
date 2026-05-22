@@ -205,16 +205,21 @@ function Landing() {
             { icon: Coins, label: "XP Paid Out", value: mockStats.xpPaid },
             { icon: Trophy, label: "Offers Completed", value: mockStats.offers },
             { icon: Wallet, label: "Secure Payouts", value: mockStats.payouts },
-          ].map((s) => (
-            <div key={s.label} className="relative overflow-hidden rounded-2xl glass p-5 shadow-card">
-              <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-20 blur-2xl" />
-              <s.icon className="h-5 w-5 text-primary" />
-              <div className="mt-3 font-display text-2xl md:text-3xl font-bold tabular-nums text-gradient-primary">{s.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-            </div>
+          ].map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
+              <div className="relative overflow-hidden rounded-2xl glass p-5 shadow-card transition hover:-translate-y-1 hover:shadow-glow-primary">
+                <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-20 blur-2xl" />
+                <s.icon className="h-5 w-5 text-primary" />
+                <div className="mt-3 font-display text-2xl md:text-3xl font-bold tabular-nums">
+                  <CountUpString value={s.value} className="text-shimmer-primary" />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
+
 
       {/* A. Featured Partners */}
       <section id="partners" className="px-4 md:px-6 pt-16 md:pt-24">
