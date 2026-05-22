@@ -45,7 +45,7 @@ export function AuthModal({
           <div className="relative p-6">
             <DialogHeader>
               <DialogTitle className="font-display text-2xl">
-                {tab === "signin" ? "Welcome back" : "Start mining XP"}
+                {tab === "signin" ? "Welcome back" : "Start earning XP"}
               </DialogTitle>
               <p className="text-sm text-muted-foreground">
                 {tab === "signin" ? "Sign in to your LootMiner account." : "Create an account in seconds."}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AuroraBackground } from "@/components/background/AuroraBackground";
 import { AppTopbar } from "./AppTopbar";
 import { MobileHeader } from "./MobileHeader";
@@ -12,11 +12,11 @@ export function AppLayout({ admin = false }: { admin?: boolean }) {
   const [collapsed, setCollapsed] = useState(false);
   const auth = useAuth();
   const nav = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Demo-only gate: if not signed in, auto sign in (mock) so previews work.
   useEffect(() => {
     if (auth === null && typeof window !== "undefined") {
-      // do nothing — landing page will handle. but show content anyway since this is mock.
+      // landing handles unauth; mock previews stay open
     }
   }, [auth, nav]);
 
@@ -28,7 +28,7 @@ export function AppLayout({ admin = false }: { admin?: boolean }) {
 
       <div className="mx-auto flex w-full max-w-[1600px] gap-4 px-3 md:px-4 pb-28 md:pb-8 pt-4 md:pt-4">
         {admin ? <AdminSidebar collapsed={collapsed} /> : <DesktopSidebar collapsed={collapsed} />}
-        <main className="min-w-0 flex-1 pt-2 md:pt-4">
+        <main key={pathname} className="min-w-0 flex-1 pt-2 md:pt-4 animate-page-in">
           <Outlet />
         </main>
       </div>
@@ -37,3 +37,4 @@ export function AppLayout({ admin = false }: { admin?: boolean }) {
     </div>
   );
 }
+
