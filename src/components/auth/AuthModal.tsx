@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { signIn } from "@/lib/auth";
+import { Logo } from "@/components/common/Logo";
 import { Check, Diamond, Flame, Crown, Hexagon, Rocket, Star, Sparkles, Zap } from "lucide-react";
+
 
 const avatars = [
   { id: "diamond", icon: Diamond, color: "from-cyan-400 to-blue-500" },
@@ -43,11 +45,14 @@ export function AuthModal({
           <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
           <div className="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-gradient-accent opacity-30 blur-3xl" />
           <div className="relative p-6">
+            <div className="mb-4 flex items-center justify-center">
+              <Logo to="/" size="lg" />
+            </div>
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl">
-                {tab === "signin" ? "Welcome back" : "Start mining XP"}
+              <DialogTitle className="font-display text-2xl text-center">
+                {tab === "signin" ? "Welcome back" : "Start earning XP"}
               </DialogTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground text-center">
                 {tab === "signin" ? "Sign in to your LootMiner account." : "Create an account in seconds."}
               </p>
             </DialogHeader>

@@ -5,13 +5,17 @@ import { AuroraBackground } from "@/components/background/AuroraBackground";
 import { Logo } from "@/components/common/Logo";
 import { LiveLeadsTicker } from "@/components/landing/LiveLeadsTicker";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { CountUpString } from "@/components/common/CountUp";
+import { Reveal } from "@/components/common/Reveal";
 import { mockStats, mockFAQs, mockOfferwalls, mockSurveys } from "@/data/mock";
 import {
   ArrowRight, ChevronDown, Sparkles, ShieldCheck, Zap, Diamond,
   Users, Coins, Trophy, Wallet, Compass, CheckCircle2, Star,
   Gauge, Layers, Lock, Banknote, Bitcoin, Gift, Building2,
   UserPlus, MousePointerClick, Rocket, BadgeCheck, Eye, Headset, ScrollText,
+  Activity, Flame, TicketPercent, Users2, Award,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,31 +90,59 @@ function Landing() {
               #1 Rewards Platform of 2026
             </span>
             <h1 className="mt-5 font-display text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-              Earn premium <span className="text-gradient-xp">XP rewards</span> from offers, surveys, and tasks.
+              Earn premium{" "}
+              <span className="text-shimmer-xp">XP rewards</span>{" "}
+              from offers, surveys, and tasks.
             </h1>
-            <p className="mt-5 max-w-xl text-base md:text-lg text-muted-foreground">
-              Complete offers. Earn XP. Cash out. Join 240k+ members turning their time into PayPal cash, crypto, and gift cards on the premium GPT/CPA rewards platform.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <button onClick={() => open("signup")} className="inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition">
-                Start Earning Free <Sparkles className="h-4 w-4" />
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5 max-w-xl text-base md:text-lg text-muted-foreground"
+            >
+              Complete offers. <span className="text-shimmer-primary font-semibold">Earn XP.</span>{" "}
+              <span className="text-shimmer-primary font-semibold">Cash out.</span>{" "}
+              Join 240k+ members turning their time into PayPal cash, crypto, and gift{" "}
+              <span className="text-shimmer-xp font-semibold">Rewards</span> on the premium GPT/CPA platform.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-7 flex flex-wrap gap-3"
+            >
+              <button
+                onClick={() => open("signup")}
+                className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary animate-glow-soft hover:opacity-95 transition"
+              >
+                <span className="absolute inset-0 rounded-xl bg-[linear-gradient(115deg,transparent_35%,rgba(255,255,255,0.25)_50%,transparent_65%)] translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative">Start Earning Free</span>
+                <Sparkles className="relative h-4 w-4" />
               </button>
               <a href="#how" className="inline-flex items-center gap-2 rounded-xl glass px-5 py-3 text-sm font-semibold hover:bg-card transition">
                 How It Works
               </a>
-            </div>
+            </motion.div>
             <div className="mt-7 flex flex-wrap gap-2">
               {[
                 { icon: CheckCircle2, label: "100% Free" },
                 { icon: Zap, label: "Instant XP" },
                 { icon: ShieldCheck, label: "Secure & Trusted" },
                 { icon: Star, label: "4.8 / 5 rating" },
-              ].map((t) => (
-                <span key={t.label} className="inline-flex items-center gap-1.5 rounded-full bg-card/60 backdrop-blur border border-border px-3 py-1.5 text-xs text-muted-foreground">
+              ].map((t, i) => (
+                <motion.span
+                  key={t.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.08, duration: 0.5 }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-card/60 backdrop-blur border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition animate-float-slow"
+                  style={{ animationDelay: `${i * 0.4}s` }}
+                >
                   <t.icon className="h-3.5 w-3.5 text-success" /> {t.label}
-                </span>
+                </motion.span>
               ))}
             </div>
+
           </div>
 
           {/* Right visual */}
@@ -173,16 +205,21 @@ function Landing() {
             { icon: Coins, label: "XP Paid Out", value: mockStats.xpPaid },
             { icon: Trophy, label: "Offers Completed", value: mockStats.offers },
             { icon: Wallet, label: "Secure Payouts", value: mockStats.payouts },
-          ].map((s) => (
-            <div key={s.label} className="relative overflow-hidden rounded-2xl glass p-5 shadow-card">
-              <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-20 blur-2xl" />
-              <s.icon className="h-5 w-5 text-primary" />
-              <div className="mt-3 font-display text-2xl md:text-3xl font-bold tabular-nums text-gradient-primary">{s.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-            </div>
+          ].map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
+              <div className="relative overflow-hidden rounded-2xl glass p-5 shadow-card transition hover:-translate-y-1 hover:shadow-glow-primary">
+                <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-20 blur-2xl" />
+                <s.icon className="h-5 w-5 text-primary" />
+                <div className="mt-3 font-display text-2xl md:text-3xl font-bold tabular-nums">
+                  <CountUpString value={s.value} className="text-shimmer-primary" />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
+
 
       {/* A. Featured Partners */}
       <section id="partners" className="px-4 md:px-6 pt-16 md:pt-24">
@@ -322,6 +359,40 @@ function Landing() {
         </div>
       </section>
 
+      {/* Platform Features */}
+      <section className="px-4 md:px-6 pt-16 md:pt-24">
+        <div className="mx-auto max-w-7xl">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Platform"
+              title="Everything you need to earn smarter"
+              subtitle="A complete rewards toolkit, designed for premium earners."
+            />
+          </Reveal>
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            {[
+              { icon: Activity, title: "Live Activity", desc: "Real-time XP feed" },
+              { icon: Flame, title: "Daily Streaks", desc: "Bonus every day" },
+              { icon: TicketPercent, title: "Promo Codes", desc: "Redeem & boost" },
+              { icon: Users2, title: "Referrals", desc: "10% for life" },
+              { icon: Award, title: "Leaderboard", desc: "Weekly prizes" },
+              { icon: Eye, title: "XP History", desc: "Fully transparent" },
+            ].map((f, i) => (
+              <Reveal key={f.title} delay={i * 0.05}>
+                <div className="group relative overflow-hidden rounded-2xl glass p-4 shadow-card hover:-translate-y-1 hover:shadow-glow-primary transition h-full">
+                  <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-15 blur-2xl group-hover:opacity-40 transition" />
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow-primary">
+                    <f.icon className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div className="relative mt-3 font-display text-sm font-bold">{f.title}</div>
+                  <div className="relative mt-0.5 text-[11px] text-muted-foreground">{f.desc}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* E. Trust & Security */}
       <section className="px-4 md:px-6 pt-16 md:pt-24">
         <div className="mx-auto max-w-7xl">
@@ -388,9 +459,11 @@ function Landing() {
               <p className="mt-2 text-primary-foreground/80">Join 240,000+ members earning every day.</p>
               <button
                 onClick={() => open("signup")}
-                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-background px-6 py-3 text-sm font-bold text-foreground shadow-card hover:scale-[1.02] transition"
+                className="group relative mt-6 inline-flex items-center gap-2 overflow-hidden rounded-xl bg-background px-6 py-3 text-sm font-bold text-foreground shadow-card hover:scale-[1.02] transition animate-glow-soft"
               >
-                Start Earning Free <ArrowRight className="h-4 w-4" />
+                <span className="absolute inset-0 bg-[linear-gradient(115deg,transparent_35%,rgba(255,255,255,0.35)_50%,transparent_65%)] translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative">Start Earning Free</span>
+                <ArrowRight className="relative h-4 w-4" />
               </button>
             </div>
           </div>

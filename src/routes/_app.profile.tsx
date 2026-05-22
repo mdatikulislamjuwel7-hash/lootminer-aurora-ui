@@ -83,24 +83,56 @@ function Profile() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {["Earning", "Withdraw"].map((t) => (
-          <section key={t} className="rounded-3xl glass p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold">{t} Summary</h2>
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-              {[
-                { l: "Paid", v: t === "Earning" ? 28900 : 22500 },
-                { l: "Pending", v: t === "Earning" ? 320 : 1200 },
-                { l: "Hold", v: 0 },
-              ].map((s) => (
-                <div key={s.l} className="rounded-xl bg-card/60 border border-border p-3">
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{s.l}</div>
-                  <div className="mt-1 font-display text-lg font-bold tabular-nums">{s.v.toLocaleString()}</div>
-                </div>
-              ))}
+        {([
+          { title: "Earning Summary", icon: "sparkles" as const, rows: [
+            { l: "Paid",    v: 28900, tone: "success" as const },
+            { l: "Pending", v: 320,   tone: "warning" as const },
+            { l: "Hold",    v: 0,     tone: "muted"   as const },
+          ] },
+          { title: "Withdraw Summary", icon: "wallet" as const, rows: [
+            { l: "Paid",    v: 22500, tone: "success" as const },
+            { l: "Pending", v: 1200,  tone: "warning" as const },
+            { l: "Hold",    v: 0,     tone: "muted"   as const },
+          ] },
+        ]).map((s) => (
+          <section key={s.title} className="relative overflow-hidden rounded-3xl glass p-6 shadow-card">
+            <div className="absolute -top-16 -right-16 h-44 w-44 rounded-full bg-gradient-primary opacity-15 blur-3xl" />
+            <h2 className="relative font-display text-xl font-bold">{s.title}</h2>
+            <div className="relative mt-4 grid grid-cols-3 gap-3">
+              {s.rows.map((r) => {
+                const styles =
+                  r.tone === "success"
+                    ? "bg-success/10 ring-success/30 text-success"
+                    : r.tone === "warning"
+                    ? "bg-xp/10 ring-xp/30 text-xp"
+                    : "bg-muted/30 ring-border text-muted-foreground";
+                const dot =
+                  r.tone === "success"
+                    ? "bg-success shadow-[0_0_10px_oklch(0.78_0.18_165/0.7)]"
+                    : r.tone === "warning"
+                    ? "bg-xp shadow-glow-xp"
+                    : "bg-muted-foreground/50";
+                return (
+                  <div
+                    key={r.l}
+                    className={`group relative overflow-hidden rounded-2xl ring-1 ${styles} p-3 transition hover:-translate-y-0.5`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest font-bold">{r.l}</span>
+                      <span className={`h-1.5 w-1.5 rounded-full ${dot} ${r.tone !== "muted" ? "animate-pulse" : ""}`} />
+                    </div>
+                    <div className="mt-2 font-display text-xl font-bold tabular-nums text-foreground">
+                      {r.v.toLocaleString()}
+                    </div>
+                    <div className="mt-0.5 text-[10px] text-muted-foreground">XP</div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         ))}
       </div>
+
 
       <section className="rounded-3xl glass shadow-card overflow-hidden">
         <div className="p-5 font-display text-xl font-bold">Activity History</div>
