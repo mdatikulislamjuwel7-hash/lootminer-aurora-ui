@@ -57,12 +57,16 @@
   --animate-aurora-drift: aurora-drift 28s ease-in-out infinite;
   --animate-aurora-drift-slow: aurora-drift 42s ease-in-out infinite reverse;
   --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
-  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-glow-soft: glow-soft 3.6s ease-in-out infinite;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-text-shimmer: text-shimmer 5s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
   --animate-marquee: marquee 50s linear infinite;
   --animate-spin-slow: spin 18s linear infinite;
   --animate-orbit: orbit 14s linear infinite;
   --animate-orbit-reverse: orbit 18s linear infinite reverse;
+  --animate-page-in: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes aurora-drift {
     0%, 100% { transform: translate3d(0,0,0) scale(1); }
@@ -78,6 +82,14 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+  @keyframes text-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes glow-soft {
+    0%, 100% { box-shadow: 0 0 24px oklch(0.82 0.15 200 / 0.35); }
+    50% { box-shadow: 0 0 42px oklch(0.82 0.15 200 / 0.55), 0 0 18px oklch(0.62 0.24 305 / 0.35); }
+  }
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
@@ -89,6 +101,10 @@
   @keyframes orbit {
     from { transform: rotate(0deg) translateX(var(--orbit-r, 120px)) rotate(0deg); }
     to { transform: rotate(360deg) translateX(var(--orbit-r, 120px)) rotate(-360deg); }
+  }
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -213,6 +229,34 @@
     background: var(--gradient-xp);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
+  .text-shimmer-primary {
+    background-image: linear-gradient(
+      90deg,
+      oklch(0.82 0.15 200) 0%,
+      oklch(0.92 0.16 200) 25%,
+      oklch(0.7 0.24 305) 50%,
+      oklch(0.92 0.16 200) 75%,
+      oklch(0.82 0.15 200) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: text-shimmer 5s ease-in-out infinite;
+  }
+  .text-shimmer-xp {
+    background-image: linear-gradient(
+      90deg,
+      oklch(0.86 0.16 88) 0%,
+      oklch(0.95 0.17 88) 30%,
+      oklch(0.78 0.18 60) 50%,
+      oklch(0.95 0.17 88) 70%,
+      oklch(0.86 0.16 88) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: text-shimmer 4s ease-in-out infinite;
+  }
+  .animate-glow-soft { animation: glow-soft 3.6s ease-in-out infinite; }
+  .animate-page-in { animation: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .bg-gradient-primary { background: var(--gradient-primary); }
   .bg-gradient-accent { background: var(--gradient-accent); }
   .bg-gradient-success { background: var(--gradient-success); }
