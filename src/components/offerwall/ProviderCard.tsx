@@ -1,46 +1,57 @@
 import type { Provider } from "@/data/mock";
-import { Coins } from "lucide-react";
+import { Star } from "lucide-react";
 
-export function ProviderCard({ p }: { p: Provider }) {
+export function ProviderCard({
+  p, onOpen,
+}: { p: Provider; onOpen: (p: Provider) => void }) {
   const Icon = p.icon;
+  const initials = p.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  const disabled = !p.enabled;
   return (
-    <a
-      href="#"
-      onClick={(e) => e.preventDefault()}
-      className="group relative block overflow-hidden rounded-2xl glass p-3 md:p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    <button
+      type="button"
+      onClick={() => !disabled && onOpen(p)}
+      disabled={disabled}
+      className={`group relative block w-full overflow-hidden rounded-2xl glass p-3 md:p-4 text-left shine shadow-card transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+        disabled ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 hover:shadow-glow-primary cursor-pointer ring-gradient"
+      }`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} opacity-50 group-hover:opacity-90 transition-opacity`} />
-      <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-card/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-card/85 via-card/30 to-transparent" />
 
-      {p.badge && (
-        <span className={`absolute top-2 right-2 z-10 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider
-          ${p.badge === "HOT" ? "bg-destructive/90 text-destructive-foreground" :
-            p.badge === "NEW" ? "bg-success/90 text-success-foreground" :
-            "bg-warning/90 text-warning-foreground"}`}>
-          {p.badge}
+      {p.isTopOffer && !disabled && (
+        <span className="absolute top-2 right-2 z-10 rounded-full bg-destructive px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-destructive-foreground shadow-glow-accent">
+          HOT
         </span>
       )}
+      <span className="absolute top-2 left-2 z-10 rounded-full bg-background/70 backdrop-blur px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground border border-border">
+        {p.type === "offerwall" ? "Offerwall" : "Survey"}
+      </span>
 
-      <div className="relative flex flex-col gap-3">
+      {disabled && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <span className="rounded-full bg-warning/90 text-warning-foreground px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Maintenance</span>
+        </div>
+      )}
+
+      <div className="relative flex flex-col items-center text-center gap-2 pt-4">
         <div className="relative">
-          <div className="absolute inset-0 rounded-xl bg-gradient-primary blur-md opacity-0 group-hover:opacity-60 transition-opacity" />
-          <div className="relative flex h-11 w-11 md:h-12 md:w-12 items-center justify-center rounded-xl bg-background/60 backdrop-blur border border-border">
-            <Icon className="h-5 w-5 md:h-6 md:w-6 text-foreground" />
+          <div className="absolute -inset-1 rounded-2xl bg-gradient-primary opacity-0 blur-md group-hover:opacity-70 transition-opacity" />
+          <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-background/60 backdrop-blur border border-border">
+            <Icon className="h-6 w-6 text-foreground" />
+            <span className="absolute -bottom-1 -right-1 rounded-md bg-gradient-primary text-[8px] font-bold px-1 py-0.5 text-primary-foreground shadow-glow-primary">
+              {initials}
+            </span>
           </div>
         </div>
-
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-sm md:text-base font-semibold">{p.name}</h3>
-          <p className="mt-0.5 text-[10px] md:text-xs text-muted-foreground">{p.completions} done</p>
+        <div className="mt-1 font-display text-sm md:text-base font-semibold truncate w-full">{p.name}</div>
+        <div className="flex items-center gap-0.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star key={i} className={`h-3 w-3 ${i < Math.round(p.rating) ? "text-xp fill-xp" : "text-muted-foreground/30"}`} />
+          ))}
         </div>
-
-        <div className="flex items-center gap-1.5 rounded-lg bg-background/40 backdrop-blur px-2 py-1.5 border border-border">
-          <Coins className="h-3 w-3 text-primary" />
-          <span className="text-[10px] md:text-xs font-semibold tabular-nums">
-            {p.payoutFrom}–{p.payoutTo.toLocaleString()}
-          </span>
-        </div>
+        <div className="text-[10px] text-muted-foreground tabular-nums">{p.rating.toFixed(1)} / 5</div>
       </div>
-    </a>
+    </button>
   );
 }
