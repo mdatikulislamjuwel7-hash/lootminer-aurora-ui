@@ -6,16 +6,16 @@ import {
 
 const items = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/offerwalls", label: "Offerwalls", icon: Layers },
-  { to: "/admin/surveys", label: "Surveys", icon: ListChecks },
-  { to: "/admin/top-offers", label: "Top Offers", icon: Flame },
-  { to: "/admin/leads", label: "Leads", icon: ScrollText },
-  { to: "/admin/cashouts", label: "Cashout", icon: Wallet },
-  { to: "/admin/promos", label: "Promo Codes", icon: Ticket },
-  { to: "/admin/logs", label: "Logs", icon: FileText },
-  { to: "/admin/levels", label: "Level", icon: Award },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin/users", label: "Users", icon: Users, exact: false },
+  { to: "/admin/offerwalls", label: "Offerwalls", icon: Layers, exact: false },
+  { to: "/admin/surveys", label: "Surveys", icon: ListChecks, exact: false },
+  { to: "/admin/top-offers", label: "Top Offers", icon: Flame, exact: false },
+  { to: "/admin/leads", label: "Leads", icon: ScrollText, exact: false },
+  { to: "/admin/cashouts", label: "Cashout", icon: Wallet, exact: false },
+  { to: "/admin/promos", label: "Promo Codes", icon: Ticket, exact: false },
+  { to: "/admin/logs", label: "Logs", icon: FileText, exact: false },
+  { to: "/admin/levels", label: "Level", icon: Award, exact: false },
+  { to: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
 
 export function AdminSidebar({ collapsed }: { collapsed: boolean }) {
