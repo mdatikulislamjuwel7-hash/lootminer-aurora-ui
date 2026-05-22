@@ -1,7 +1,8 @@
 import { Logo } from "@/components/common/Logo";
 import { XpPill } from "@/components/common/XpPill";
 import { AvatarDropdown } from "./AvatarDropdown";
-import { Bell, Menu, ShieldHalf } from "lucide-react";
+import { NotificationDropdown } from "./NotificationDropdown";
+import { Menu, ShieldHalf } from "lucide-react";
 
 export function AppTopbar({
   onToggleSidebar, admin = false,
