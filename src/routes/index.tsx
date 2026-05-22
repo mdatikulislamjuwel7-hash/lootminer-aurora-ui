@@ -359,6 +359,40 @@ function Landing() {
         </div>
       </section>
 
+      {/* Platform Features */}
+      <section className="px-4 md:px-6 pt-16 md:pt-24">
+        <div className="mx-auto max-w-7xl">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Platform"
+              title="Everything you need to earn smarter"
+              subtitle="A complete rewards toolkit, designed for premium earners."
+            />
+          </Reveal>
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            {[
+              { icon: Activity, title: "Live Activity", desc: "Real-time XP feed" },
+              { icon: Flame, title: "Daily Streaks", desc: "Bonus every day" },
+              { icon: TicketPercent, title: "Promo Codes", desc: "Redeem & boost" },
+              { icon: Users2, title: "Referrals", desc: "10% for life" },
+              { icon: Award, title: "Leaderboard", desc: "Weekly prizes" },
+              { icon: Eye, title: "XP History", desc: "Fully transparent" },
+            ].map((f, i) => (
+              <Reveal key={f.title} delay={i * 0.05}>
+                <div className="group relative overflow-hidden rounded-2xl glass p-4 shadow-card hover:-translate-y-1 hover:shadow-glow-primary transition h-full">
+                  <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-gradient-primary opacity-15 blur-2xl group-hover:opacity-40 transition" />
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-glow-primary">
+                    <f.icon className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div className="relative mt-3 font-display text-sm font-bold">{f.title}</div>
+                  <div className="relative mt-0.5 text-[11px] text-muted-foreground">{f.desc}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* E. Trust & Security */}
       <section className="px-4 md:px-6 pt-16 md:pt-24">
         <div className="mx-auto max-w-7xl">
