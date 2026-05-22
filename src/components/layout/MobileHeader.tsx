@@ -1,6 +1,7 @@
 import { Logo } from "@/components/common/Logo";
 import { XpPill } from "@/components/common/XpPill";
 import { AvatarDropdown } from "./AvatarDropdown";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export function MobileHeader({ admin = false }: { admin?: boolean }) {
   return (
@@ -8,8 +9,9 @@ export function MobileHeader({ admin = false }: { admin?: boolean }) {
       <div className="px-3 pt-3">
         <div className="flex items-center gap-2 rounded-2xl glass px-3 py-2 shadow-card">
           <Logo to={admin ? "/admin" : "/dashboard"} />
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5">
             <XpPill />
+            <NotificationDropdown />
             <AvatarDropdown />
           </div>
         </div>
