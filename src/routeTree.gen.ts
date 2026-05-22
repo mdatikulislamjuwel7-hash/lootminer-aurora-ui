@@ -9,27 +9,533 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTopOffersRouteImport } from './routes/_app.top-offers'
+import { Route as AppSupportRouteImport } from './routes/_app.support'
+import { Route as AppRewardsRouteImport } from './routes/_app.rewards'
+import { Route as AppReferralsRouteImport } from './routes/_app.referrals'
+import { Route as AppRankingRouteImport } from './routes/_app.ranking'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppEarnRouteImport } from './routes/_app.earn'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCashoutRouteImport } from './routes/_app.cashout'
+import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminUsersRouteImport } from './routes/_admin.admin.users'
+import { Route as AdminAdminTopOffersRouteImport } from './routes/_admin.admin.top-offers'
+import { Route as AdminAdminSurveysRouteImport } from './routes/_admin.admin.surveys'
+import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.settings'
+import { Route as AdminAdminPromosRouteImport } from './routes/_admin.admin.promos'
+import { Route as AdminAdminOfferwallsRouteImport } from './routes/_admin.admin.offerwalls'
+import { Route as AdminAdminLogsRouteImport } from './routes/_admin.admin.logs'
+import { Route as AdminAdminLevelsRouteImport } from './routes/_admin.admin.levels'
+import { Route as AdminAdminLeadsRouteImport } from './routes/_admin.admin.leads'
+import { Route as AdminAdminCashoutsRouteImport } from './routes/_admin.admin.cashouts'
 
-export interface FileRoutesByFullPath {}
-export interface FileRoutesByTo {}
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTopOffersRoute = AppTopOffersRouteImport.update({
+  id: '/top-offers',
+  path: '/top-offers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSupportRoute = AppSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRewardsRoute = AppRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReferralsRoute = AppReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRankingRoute = AppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEarnRoute = AppEarnRouteImport.update({
+  id: '/earn',
+  path: '/earn',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCashoutRoute = AppCashoutRouteImport.update({
+  id: '/cashout',
+  path: '/cashout',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminAdminRoute = AdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminUsersRoute = AdminAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminTopOffersRoute = AdminAdminTopOffersRouteImport.update({
+  id: '/top-offers',
+  path: '/top-offers',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminSurveysRoute = AdminAdminSurveysRouteImport.update({
+  id: '/surveys',
+  path: '/surveys',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminSettingsRoute = AdminAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminPromosRoute = AdminAdminPromosRouteImport.update({
+  id: '/promos',
+  path: '/promos',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminOfferwallsRoute = AdminAdminOfferwallsRouteImport.update({
+  id: '/offerwalls',
+  path: '/offerwalls',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminLogsRoute = AdminAdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminLevelsRoute = AdminAdminLevelsRouteImport.update({
+  id: '/levels',
+  path: '/levels',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminLeadsRoute = AdminAdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminCashoutsRoute = AdminAdminCashoutsRouteImport.update({
+  id: '/cashouts',
+  path: '/cashouts',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/admin': typeof AdminAdminRouteWithChildren
+  '/cashout': typeof AppCashoutRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/earn': typeof AppEarnRoute
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/referrals': typeof AppReferralsRoute
+  '/rewards': typeof AppRewardsRoute
+  '/support': typeof AppSupportRoute
+  '/top-offers': typeof AppTopOffersRoute
+  '/admin/cashouts': typeof AdminAdminCashoutsRoute
+  '/admin/leads': typeof AdminAdminLeadsRoute
+  '/admin/levels': typeof AdminAdminLevelsRoute
+  '/admin/logs': typeof AdminAdminLogsRoute
+  '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/admin/promos': typeof AdminAdminPromosRoute
+  '/admin/settings': typeof AdminAdminSettingsRoute
+  '/admin/surveys': typeof AdminAdminSurveysRoute
+  '/admin/top-offers': typeof AdminAdminTopOffersRoute
+  '/admin/users': typeof AdminAdminUsersRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/admin': typeof AdminAdminRouteWithChildren
+  '/cashout': typeof AppCashoutRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/earn': typeof AppEarnRoute
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/referrals': typeof AppReferralsRoute
+  '/rewards': typeof AppRewardsRoute
+  '/support': typeof AppSupportRoute
+  '/top-offers': typeof AppTopOffersRoute
+  '/admin/cashouts': typeof AdminAdminCashoutsRoute
+  '/admin/leads': typeof AdminAdminLeadsRoute
+  '/admin/levels': typeof AdminAdminLevelsRoute
+  '/admin/logs': typeof AdminAdminLogsRoute
+  '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/admin/promos': typeof AdminAdminPromosRoute
+  '/admin/settings': typeof AdminAdminSettingsRoute
+  '/admin/surveys': typeof AdminAdminSurveysRoute
+  '/admin/top-offers': typeof AdminAdminTopOffersRoute
+  '/admin/users': typeof AdminAdminUsersRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_admin': typeof AdminRouteWithChildren
+  '/_app': typeof AppRouteWithChildren
+  '/_admin/admin': typeof AdminAdminRouteWithChildren
+  '/_app/cashout': typeof AppCashoutRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/earn': typeof AppEarnRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/ranking': typeof AppRankingRoute
+  '/_app/referrals': typeof AppReferralsRoute
+  '/_app/rewards': typeof AppRewardsRoute
+  '/_app/support': typeof AppSupportRoute
+  '/_app/top-offers': typeof AppTopOffersRoute
+  '/_admin/admin/cashouts': typeof AdminAdminCashoutsRoute
+  '/_admin/admin/leads': typeof AdminAdminLeadsRoute
+  '/_admin/admin/levels': typeof AdminAdminLevelsRoute
+  '/_admin/admin/logs': typeof AdminAdminLogsRoute
+  '/_admin/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/_admin/admin/promos': typeof AdminAdminPromosRoute
+  '/_admin/admin/settings': typeof AdminAdminSettingsRoute
+  '/_admin/admin/surveys': typeof AdminAdminSurveysRoute
+  '/_admin/admin/top-offers': typeof AdminAdminTopOffersRoute
+  '/_admin/admin/users': typeof AdminAdminUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/cashout'
+    | '/dashboard'
+    | '/earn'
+    | '/profile'
+    | '/ranking'
+    | '/referrals'
+    | '/rewards'
+    | '/support'
+    | '/top-offers'
+    | '/admin/cashouts'
+    | '/admin/leads'
+    | '/admin/levels'
+    | '/admin/logs'
+    | '/admin/offerwalls'
+    | '/admin/promos'
+    | '/admin/settings'
+    | '/admin/surveys'
+    | '/admin/top-offers'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to:
+    | '/'
+    | '/admin'
+    | '/cashout'
+    | '/dashboard'
+    | '/earn'
+    | '/profile'
+    | '/ranking'
+    | '/referrals'
+    | '/rewards'
+    | '/support'
+    | '/top-offers'
+    | '/admin/cashouts'
+    | '/admin/leads'
+    | '/admin/levels'
+    | '/admin/logs'
+    | '/admin/offerwalls'
+    | '/admin/promos'
+    | '/admin/settings'
+    | '/admin/surveys'
+    | '/admin/top-offers'
+    | '/admin/users'
+  id:
+    | '__root__'
+    | '/'
+    | '/_admin'
+    | '/_app'
+    | '/_admin/admin'
+    | '/_app/cashout'
+    | '/_app/dashboard'
+    | '/_app/earn'
+    | '/_app/profile'
+    | '/_app/ranking'
+    | '/_app/referrals'
+    | '/_app/rewards'
+    | '/_app/support'
+    | '/_app/top-offers'
+    | '/_admin/admin/cashouts'
+    | '/_admin/admin/leads'
+    | '/_admin/admin/levels'
+    | '/_admin/admin/logs'
+    | '/_admin/admin/offerwalls'
+    | '/_admin/admin/promos'
+    | '/_admin/admin/settings'
+    | '/_admin/admin/surveys'
+    | '/_admin/admin/top-offers'
+    | '/_admin/admin/users'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
 }
 
-const rootRouteChildren: RootRouteChildren = {}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/top-offers': {
+      id: '/_app/top-offers'
+      path: '/top-offers'
+      fullPath: '/top-offers'
+      preLoaderRoute: typeof AppTopOffersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/support': {
+      id: '/_app/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AppSupportRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/rewards': {
+      id: '/_app/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof AppRewardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/referrals': {
+      id: '/_app/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof AppReferralsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ranking': {
+      id: '/_app/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AppRankingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/earn': {
+      id: '/_app/earn'
+      path: '/earn'
+      fullPath: '/earn'
+      preLoaderRoute: typeof AppEarnRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cashout': {
+      id: '/_app/cashout'
+      path: '/cashout'
+      fullPath: '/cashout'
+      preLoaderRoute: typeof AppCashoutRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_admin/admin': {
+      id: '/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/users': {
+      id: '/_admin/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminAdminUsersRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/top-offers': {
+      id: '/_admin/admin/top-offers'
+      path: '/top-offers'
+      fullPath: '/admin/top-offers'
+      preLoaderRoute: typeof AdminAdminTopOffersRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/surveys': {
+      id: '/_admin/admin/surveys'
+      path: '/surveys'
+      fullPath: '/admin/surveys'
+      preLoaderRoute: typeof AdminAdminSurveysRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/settings': {
+      id: '/_admin/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminAdminSettingsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/promos': {
+      id: '/_admin/admin/promos'
+      path: '/promos'
+      fullPath: '/admin/promos'
+      preLoaderRoute: typeof AdminAdminPromosRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/offerwalls': {
+      id: '/_admin/admin/offerwalls'
+      path: '/offerwalls'
+      fullPath: '/admin/offerwalls'
+      preLoaderRoute: typeof AdminAdminOfferwallsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/logs': {
+      id: '/_admin/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminAdminLogsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/levels': {
+      id: '/_admin/admin/levels'
+      path: '/levels'
+      fullPath: '/admin/levels'
+      preLoaderRoute: typeof AdminAdminLevelsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/leads': {
+      id: '/_admin/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminAdminLeadsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/cashouts': {
+      id: '/_admin/admin/cashouts'
+      path: '/cashouts'
+      fullPath: '/admin/cashouts'
+      preLoaderRoute: typeof AdminAdminCashoutsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+  }
+}
+
+interface AdminAdminRouteChildren {
+  AdminAdminCashoutsRoute: typeof AdminAdminCashoutsRoute
+  AdminAdminLeadsRoute: typeof AdminAdminLeadsRoute
+  AdminAdminLevelsRoute: typeof AdminAdminLevelsRoute
+  AdminAdminLogsRoute: typeof AdminAdminLogsRoute
+  AdminAdminOfferwallsRoute: typeof AdminAdminOfferwallsRoute
+  AdminAdminPromosRoute: typeof AdminAdminPromosRoute
+  AdminAdminSettingsRoute: typeof AdminAdminSettingsRoute
+  AdminAdminSurveysRoute: typeof AdminAdminSurveysRoute
+  AdminAdminTopOffersRoute: typeof AdminAdminTopOffersRoute
+  AdminAdminUsersRoute: typeof AdminAdminUsersRoute
+}
+
+const AdminAdminRouteChildren: AdminAdminRouteChildren = {
+  AdminAdminCashoutsRoute: AdminAdminCashoutsRoute,
+  AdminAdminLeadsRoute: AdminAdminLeadsRoute,
+  AdminAdminLevelsRoute: AdminAdminLevelsRoute,
+  AdminAdminLogsRoute: AdminAdminLogsRoute,
+  AdminAdminOfferwallsRoute: AdminAdminOfferwallsRoute,
+  AdminAdminPromosRoute: AdminAdminPromosRoute,
+  AdminAdminSettingsRoute: AdminAdminSettingsRoute,
+  AdminAdminSurveysRoute: AdminAdminSurveysRoute,
+  AdminAdminTopOffersRoute: AdminAdminTopOffersRoute,
+  AdminAdminUsersRoute: AdminAdminUsersRoute,
+}
+
+const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
+  AdminAdminRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAdminRoute: typeof AdminAdminRouteWithChildren
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminRoute: AdminAdminRouteWithChildren,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface AppRouteChildren {
+  AppCashoutRoute: typeof AppCashoutRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppEarnRoute: typeof AppEarnRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppRankingRoute: typeof AppRankingRoute
+  AppReferralsRoute: typeof AppReferralsRoute
+  AppRewardsRoute: typeof AppRewardsRoute
+  AppSupportRoute: typeof AppSupportRoute
+  AppTopOffersRoute: typeof AppTopOffersRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCashoutRoute: AppCashoutRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppEarnRoute: AppEarnRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppRankingRoute: AppRankingRoute,
+  AppReferralsRoute: AppReferralsRoute,
+  AppRewardsRoute: AppRewardsRoute,
+  AppSupportRoute: AppSupportRoute,
+  AppTopOffersRoute: AppTopOffersRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
