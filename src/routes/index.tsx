@@ -459,9 +459,11 @@ function Landing() {
               <p className="mt-2 text-primary-foreground/80">Join 240,000+ members earning every day.</p>
               <button
                 onClick={() => open("signup")}
-                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-background px-6 py-3 text-sm font-bold text-foreground shadow-card hover:scale-[1.02] transition"
+                className="group relative mt-6 inline-flex items-center gap-2 overflow-hidden rounded-xl bg-background px-6 py-3 text-sm font-bold text-foreground shadow-card hover:scale-[1.02] transition animate-glow-soft"
               >
-                Start Earning Free <ArrowRight className="h-4 w-4" />
+                <span className="absolute inset-0 bg-[linear-gradient(115deg,transparent_35%,rgba(255,255,255,0.35)_50%,transparent_65%)] translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative">Start Earning Free</span>
+                <ArrowRight className="relative h-4 w-4" />
               </button>
             </div>
           </div>
