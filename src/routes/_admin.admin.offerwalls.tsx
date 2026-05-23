@@ -16,12 +16,14 @@ type Draft = {
   type: "offerwall" | "survey";
   logoUrl: string;
   logoBg: string;
+  logoSize: number;
   iframeUrl: string;
   gradFrom: string;
   gradTo: string;
   isTopOffer: boolean;
   enabled: boolean;
   sortOrder: number;
+  cardPosition: number;
 };
 
 const emptyDraft: Draft = {
@@ -30,12 +32,14 @@ const emptyDraft: Draft = {
   type: "offerwall",
   logoUrl: "",
   logoBg: "#0ea5e9",
+  logoSize: 40,
   iframeUrl: "",
   gradFrom: "#22d3ee",
   gradTo: "#6366f1",
   isTopOffer: false,
   enabled: true,
   sortOrder: 0,
+  cardPosition: 1,
 };
 
 function OfferwallsPage() {
