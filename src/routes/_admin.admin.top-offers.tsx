@@ -103,6 +103,16 @@ function OfferModal({ draft, onChange, onClose, partners }: { draft: Draft; onCh
             </div>
           </Field>
 
+          <Field label="Upload Logo" full>
+            <label className="flex items-center gap-2 cursor-pointer rounded-xl bg-card/60 border border-dashed border-border px-3 py-2 text-sm hover:bg-card">
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const f = e.target.files?.[0]; if (!f) return;
+                const r = new FileReader(); r.onload = () => upd("logoUrl", String(r.result)); r.readAsDataURL(f);
+              }} />
+              <span className="text-muted-foreground">Choose image file (PNG, JPG, SVG)…</span>
+            </label>
+          </Field>
+
           <Field label="Offer URL" full>
             <input value={draft.url} onChange={(e) => upd("url", e.target.value)} placeholder="https://…" className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </Field>
