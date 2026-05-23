@@ -178,6 +178,14 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
             <input type="color" value={draft.gradTo} onChange={(e) => upd("gradTo", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
 
+
+          <FormField label="Badge Text">
+            <input value={draft.badgeText} onChange={(e) => upd("badgeText", e.target.value)} placeholder="e.g. NEW, HOT, 2X" maxLength={12} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
+          </FormField>
+          <FormField label="Badge Color">
+            <input type="color" value={draft.badgeColor} onChange={(e) => upd("badgeColor", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
+          </FormField>
+
           <div className="md:col-span-2 grid grid-cols-2 gap-3">
             <ToggleRow label="Top Offer" v={draft.isTopOffer} onChange={() => upd("isTopOffer", !draft.isTopOffer)} />
             <ToggleRow label="Enabled" v={draft.enabled} onChange={() => upd("enabled", !draft.enabled)} />
@@ -185,7 +193,10 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
 
           <div className="md:col-span-2 rounded-2xl border border-border p-3 overflow-hidden">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Live card preview</div>
-            <div className="h-24 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: `linear-gradient(135deg, ${draft.gradFrom}, ${draft.gradTo})` }}>
+            <div className="relative h-24 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: `linear-gradient(135deg, ${draft.gradFrom}, ${draft.gradTo})` }}>
+              {draft.badgeText && (
+                <span className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow" style={{ background: draft.badgeColor }}>{draft.badgeText}</span>
+              )}
               {draft.name || "Provider name"}
             </div>
           </div>
