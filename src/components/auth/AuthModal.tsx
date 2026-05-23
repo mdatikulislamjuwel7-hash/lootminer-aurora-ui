@@ -4,18 +4,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
-import { Check, Diamond, Flame, Crown, Hexagon, Rocket, Star, Sparkles, Zap } from "lucide-react";
+import { Check, Shuffle } from "lucide-react";
 
-const avatars = [
-  { id: "diamond", icon: Diamond, color: "from-cyan-400 to-blue-500" },
-  { id: "flame", icon: Flame, color: "from-orange-400 to-rose-500" },
-  { id: "crown", icon: Crown, color: "from-amber-400 to-yellow-500" },
-  { id: "hex", icon: Hexagon, color: "from-violet-400 to-fuchsia-500" },
-  { id: "rocket", icon: Rocket, color: "from-emerald-400 to-teal-500" },
-  { id: "star", icon: Star, color: "from-pink-400 to-rose-500" },
-  { id: "sparkle", icon: Sparkles, color: "from-indigo-400 to-violet-500" },
-  { id: "zap", icon: Zap, color: "from-lime-400 to-green-500" },
-];
+const AVATAR_STYLE = "bottts-neutral";
+const dicebearUrl = (seed: string) =>
+  `https://api.dicebear.com/9.x/${AVATAR_STYLE}/svg?seed=${encodeURIComponent(seed)}&radius=20`;
+const randomSeed = () => Math.random().toString(36).slice(2, 10);
+const makeAvatars = () => Array.from({ length: 8 }, () => randomSeed());
 
 export function AuthModal({
   open, mode, onOpenChange,
@@ -23,7 +18,8 @@ export function AuthModal({
   const nav = useNavigate();
   const { login, register } = useAuth();
   const [tab, setTab] = useState<"signin" | "signup">(mode);
-  const [selected, setSelected] = useState("diamond");
+  const [avatars, setAvatars] = useState<string[]>(() => makeAvatars());
+  const [selected, setSelected] = useState<string>(avatars[0]);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,7 +44,7 @@ export function AuthModal({
     e.preventDefault();
     setErr(null); setBusy(true);
     try {
-      await register({ username, email, password, avatar: selected });
+      await register({ username, email, password, avatar: dicebearUrl(selected) });
       toast.success("Account created");
       onOpenChange(false);
       nav({ to: "/dashboard" });
@@ -99,18 +95,35 @@ export function AuthModal({
             ) : (
               <form onSubmit={handleSignUp} className="mt-5 space-y-4">
                 <div>
-                  <div className="font-display text-sm font-semibold">Choose your avatar</div>
-                  <p className="text-xs text-muted-foreground">Pick a profile badge</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-display text-sm font-semibold">Choose your avatar</div>
+                      <p className="text-xs text-muted-foreground">Pick one or shuffle</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = makeAvatars();
+                        setAvatars(next);
+                        setSelected(next[0]);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" /> Shuffle
+                    </button>
+                  </div>
                   <div className="mt-3 grid grid-cols-4 gap-2">
-                    {avatars.map((a) => {
-                      const Icon = a.icon;
-                      const isSel = selected === a.id;
+                    {avatars.map((seed) => {
+                      const isSel = selected === seed;
                       return (
-                        <button key={a.id} type="button" onClick={() => setSelected(a.id)}
-                          className={`group relative aspect-square rounded-2xl border transition ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}>
-                          <div className={`absolute inset-1 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center`}>
-                            <Icon className="h-5 w-5 text-white" />
-                          </div>
+                        <button key={seed} type="button" onClick={() => setSelected(seed)}
+                          className={`group relative aspect-square rounded-2xl border transition overflow-hidden ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}>
+                          <img
+                            src={dicebearUrl(seed)}
+                            alt="avatar"
+                            loading="lazy"
+                            className="absolute inset-1 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20"
+                          />
                           {isSel && (
                             <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-primary shadow-glow-primary text-primary-foreground">
                               <Check className="h-3 w-3" />
