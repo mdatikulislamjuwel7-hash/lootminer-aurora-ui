@@ -17,6 +17,7 @@ type Draft = {
   gradFrom: string; gradTo: string;
   isTopOffer: boolean; enabled: boolean; sortOrder: number;
   cardPosition: number;
+  badgeText: string; badgeColor: string;
 };
 
 const emptyDraft: Draft = {
@@ -26,6 +27,7 @@ const emptyDraft: Draft = {
   gradFrom: "#a855f7", gradTo: "#6366f1",
   isTopOffer: false, enabled: true, sortOrder: 0,
   cardPosition: 1,
+  badgeText: "", badgeColor: "#f59e0b",
 };
 
 function SurveysPage() {
