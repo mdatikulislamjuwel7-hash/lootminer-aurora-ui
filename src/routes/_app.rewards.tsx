@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
-import { mockRewardCalendar, mockPromoHistory, mockAchievements } from "@/data/mock";
+import { rewardsAPI, promosAPI } from "@/lib/api";
 import { Check, Gift, Lock, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_app/rewards")({
@@ -10,15 +12,52 @@ export const Route = createFileRoute("/_app/rewards")({
 });
 
 function Rewards() {
+  const qc = useQueryClient();
   const [code, setCode] = useState("");
+
+  const daily = useQuery({ queryKey: ["rewards", "daily"], queryFn: rewardsAPI.dailyBonus });
+  const ach = useQuery({ queryKey: ["rewards", "achievements"], queryFn: rewardsAPI.achievements });
+
+  const claimDaily = useMutation({
+    mutationFn: rewardsAPI.claimDaily,
+    onSuccess: (d: any) => {
+      toast.success(`+${d?.xp ?? 0} XP claimed`);
+      qc.invalidateQueries({ queryKey: ["rewards"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Claim failed"),
+  });
+
+  const claimPromo = useMutation({
+    mutationFn: (c: string) => promosAPI.claim(c),
+    onSuccess: (d: any) => {
+      toast.success(`Promo claimed: +${d?.xp ?? 0} XP`);
+      setCode("");
+      qc.invalidateQueries({ queryKey: ["rewards"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Invalid code"),
+  });
+
+  const calendar = daily.data?.calendar ?? [];
+  const history = daily.data?.history ?? [];
+  const achievements = ach.data?.achievements ?? [];
+
   return (
     <div className="space-y-8">
       <PageHeader eyebrow="Rewards" title="Bonuses, codes & glory" />
 
       <section>
-        <h2 className="mb-4 font-display text-xl font-bold flex items-center gap-2"><Gift className="h-5 w-5 text-xp" /> 30-Day Calendar</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-xl font-bold flex items-center gap-2"><Gift className="h-5 w-5 text-xp" /> 30-Day Calendar</h2>
+          {daily.data?.canClaim && (
+            <button onClick={() => claimDaily.mutate()} disabled={claimDaily.isPending} className="rounded-xl bg-gradient-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow-primary disabled:opacity-60">
+              {claimDaily.isPending ? "Claiming…" : "Claim today"}
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-7 md:grid-cols-10 gap-2">
-          {mockRewardCalendar.map((d) => (
+          {calendar.map((d: any) => (
             <div key={d.day} className={`relative aspect-square rounded-xl border flex flex-col items-center justify-center text-xs ${
               d.today ? "bg-gradient-primary text-primary-foreground shadow-glow-primary border-transparent" :
               d.claimed ? "bg-success/15 text-success border-success/30" : "glass border-border text-muted-foreground"
@@ -35,38 +74,39 @@ function Rewards() {
           <h2 className="font-display text-xl font-bold">Promo Code</h2>
           <div className="mt-4 flex gap-2">
             <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="WELCOME500" className="flex-1 rounded-xl bg-card/60 border border-border px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary uppercase tracking-wider" />
-            <button className="rounded-xl bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow-primary">Claim</button>
+            <button onClick={() => code.trim() && claimPromo.mutate(code.trim())} disabled={claimPromo.isPending} className="rounded-xl bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow-primary disabled:opacity-60">
+              {claimPromo.isPending ? "…" : "Claim"}
+            </button>
           </div>
           <div className="mt-5 text-xs uppercase tracking-widest text-muted-foreground">Claimed history</div>
           <div className="mt-2 space-y-2">
-            {mockPromoHistory.map((p) => (
+            {history.map((p: any) => (
               <div key={p.id} className="flex items-center justify-between rounded-xl bg-card/60 border border-border px-4 py-2.5">
                 <div>
                   <div className="font-mono text-sm">{p.code}</div>
-                  <div className="text-[10px] text-muted-foreground">{p.claimed}</div>
+                  <div className="text-[10px] text-muted-foreground">{p.claimed ?? p.claimedAt}</div>
                 </div>
                 <span className="text-sm font-semibold text-gradient-xp tabular-nums">+{p.xp} XP</span>
               </div>
             ))}
+            {history.length === 0 && <div className="text-xs text-muted-foreground py-2">No codes claimed yet.</div>}
           </div>
         </div>
 
         <div className="rounded-3xl glass p-6 shadow-card">
           <h2 className="font-display text-xl font-bold">Achievements</h2>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            {mockAchievements.map((a) => {
-              const Icon = a.icon;
-              return (
-                <div key={a.id} className={`relative overflow-hidden rounded-2xl glass p-4 shadow-card ${!a.unlocked && "opacity-70"}`}>
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${a.unlocked ? "bg-gradient-xp shadow-glow-xp text-xp-foreground" : "bg-card border border-border text-muted-foreground"}`}>
-                    {a.unlocked ? <Icon className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
-                  </div>
-                  <div className="mt-3 font-display text-sm font-bold">{a.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{a.desc}</div>
-                  <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-xp"><Sparkles className="h-3 w-3" /> +{a.xp}</div>
+            {achievements.map((a: any) => (
+              <div key={a.id} className={`relative overflow-hidden rounded-2xl glass p-4 shadow-card ${!a.unlocked && "opacity-70"}`}>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${a.unlocked ? "bg-gradient-xp shadow-glow-xp text-xp-foreground" : "bg-card border border-border text-muted-foreground"}`}>
+                  {a.unlocked ? <Sparkles className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
                 </div>
-              );
-            })}
+                <div className="mt-3 font-display text-sm font-bold">{a.name}</div>
+                <div className="text-[10px] text-muted-foreground">{a.desc ?? a.description}</div>
+                <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-xp"><Sparkles className="h-3 w-3" /> +{a.xp}</div>
+              </div>
+            ))}
+            {achievements.length === 0 && <div className="text-xs text-muted-foreground col-span-2">No achievements yet.</div>}
           </div>
         </div>
       </section>
