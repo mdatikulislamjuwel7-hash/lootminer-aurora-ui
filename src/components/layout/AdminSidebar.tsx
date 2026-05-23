@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Zap, ClipboardList, Star, TrendingUp,
-  Wallet, Ticket, Award, CreditCard, Radio, Settings, ScrollText,
+  Wallet, Ticket, Award, CreditCard, Radio, Settings, ScrollText, ShieldAlert,
 } from "lucide-react";
 
 const items = [
@@ -11,6 +11,7 @@ const items = [
   { to: "/admin/surveys", label: "Survey Partners", icon: ClipboardList, exact: false },
   { to: "/admin/top-offers", label: "Top Offers", icon: Star, exact: false },
   { to: "/admin/leads", label: "Leads", icon: TrendingUp, exact: false },
+  { to: "/admin/offer-pending", label: "Offer Pending", icon: ShieldAlert, exact: false },
   { to: "/admin/cashouts", label: "Cashouts", icon: Wallet, exact: false },
   { to: "/admin/promos", label: "Promo Codes", icon: Ticket, exact: false },
   { to: "/admin/levels", label: "Levels", icon: Award, exact: false },
