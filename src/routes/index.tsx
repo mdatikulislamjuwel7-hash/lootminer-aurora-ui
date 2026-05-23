@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/background/AuroraBackground";
 import { Logo } from "@/components/common/Logo";
@@ -7,7 +8,10 @@ import { LiveLeadsTicker } from "@/components/landing/LiveLeadsTicker";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { CountUpString } from "@/components/common/CountUp";
 import { Reveal } from "@/components/common/Reveal";
-import { mockStats, mockFAQs, mockOfferwalls, mockSurveys } from "@/data/mock";
+import { publicAPI } from "@/lib/api";
+import { mockFAQs } from "@/data/mock";
+import type { ApiProvider } from "@/lib/types";
+import { Diamond as DefaultProviderIcon } from "lucide-react";
 import {
   ArrowRight, ChevronDown, Sparkles, ShieldCheck, Zap, Diamond,
   Users, Coins, Trophy, Wallet, Compass, CheckCircle2, Star,
@@ -34,17 +38,24 @@ function Landing() {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const open = (m: "signin" | "signup") => { setAuthMode(m); setAuthOpen(true); };
 
-  // 8 featured partner cards
-  const featured = [
-    mockOfferwalls.find(p => p.id === "adgem")!,
-    mockOfferwalls.find(p => p.id === "lootably")!,
-    mockSurveys.find(p => p.id === "bitlabs")!,
-    mockSurveys.find(p => p.id === "cpx")!,
-    mockOfferwalls.find(p => p.id === "monlix")!,
-    mockSurveys.find(p => p.id === "pollmine")!,
-    mockOfferwalls.find(p => p.id === "notik")!,
-    mockOfferwalls.find(p => p.id === "offery")!,
-  ].filter(Boolean);
+  const statsQ = useQuery({ queryKey: ["public-stats"], queryFn: publicAPI.stats });
+  const settingsQ = useQuery({ queryKey: ["public-settings"], queryFn: publicAPI.settings });
+  const partnersQ = useQuery({ queryKey: ["public-offerwalls"], queryFn: publicAPI.offerwalls });
+  const stats = statsQ.data ?? { members: "—", xpPaid: "—", offers: "—", payouts: "—" };
+  const settings = settingsQ.data ?? {};
+  const liveLeadsEnabled = settings.live_leads_enabled !== false;
+  const partners: ApiProvider[] = (partnersQ.data?.offerwalls ?? partnersQ.data ?? []).slice(0, 8);
+
+  if (settings.maintenance_mode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md rounded-3xl glass p-8 text-center shadow-card">
+          <h1 className="font-display text-2xl font-bold">We're sprucing things up</h1>
+          <p className="mt-2 text-sm text-muted-foreground">LootMiner is briefly down for maintenance. Check back soon.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -79,7 +90,7 @@ function Landing() {
         </div>
       </header>
 
-      <div className="mt-3"><LiveLeadsTicker /></div>
+      {liveLeadsEnabled && <div className="mt-3"><LiveLeadsTicker /></div>}
 
       {/* Hero */}
       <section className="px-4 md:px-6">
@@ -201,10 +212,10 @@ function Landing() {
       <section className="px-4 md:px-6">
         <div className="mx-auto max-w-7xl grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {[
-            { icon: Users, label: "Active Members", value: mockStats.members },
-            { icon: Coins, label: "XP Paid Out", value: mockStats.xpPaid },
-            { icon: Trophy, label: "Offers Completed", value: mockStats.offers },
-            { icon: Wallet, label: "Secure Payouts", value: mockStats.payouts },
+            { icon: Users, label: "Active Members", value: stats.members },
+            { icon: Coins, label: "XP Paid Out", value: stats.xpPaid },
+            { icon: Trophy, label: "Offers Completed", value: stats.offers },
+            { icon: Wallet, label: "Secure Payouts", value: stats.payouts },
           ].map((s, i) => (
             <Reveal key={s.label} delay={i * 0.08}>
               <div className="relative overflow-hidden rounded-2xl glass p-5 shadow-card transition hover:-translate-y-1 hover:shadow-glow-primary">
@@ -230,21 +241,23 @@ function Landing() {
             subtitle="A curated network of premium offerwall and survey providers."
           />
           <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-            {featured.map((p) => (
+            {partners.map((p) => (
               <div
                 key={p.id}
                 className="group relative overflow-hidden rounded-2xl glass p-4 shadow-card transition hover:-translate-y-1 hover:shadow-glow-primary cursor-pointer"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} opacity-40 group-hover:opacity-70 transition`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient ?? "from-cyan-500/40 to-blue-600/30"} opacity-40 group-hover:opacity-70 transition`} />
                 <div className="relative flex flex-col items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background/60 backdrop-blur ring-1 ring-white/10">
-                    <p.icon className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background/60 backdrop-blur ring-1 ring-white/10 overflow-hidden">
+                    {p.logoUrl
+                      ? <img src={p.logoUrl} alt={p.name} className="h-8 w-8 object-contain" />
+                      : <DefaultProviderIcon className="h-5 w-5 text-primary" />}
                   </div>
                   <div className="min-w-0">
                     <div className="font-display text-sm font-bold truncate">{p.name}</div>
                     <div className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                       <Star className="h-2.5 w-2.5 fill-xp text-xp" />
-                      <span className="tabular-nums">{p.rating.toFixed(1)}</span>
+                      <span className="tabular-nums">{(p.rating ?? 0).toFixed(1)}</span>
                     </div>
                   </div>
                   <span className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
