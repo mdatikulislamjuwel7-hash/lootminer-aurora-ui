@@ -17,6 +17,7 @@ type Draft = {
   gradFrom: string; gradTo: string;
   isTopOffer: boolean; enabled: boolean; sortOrder: number;
   cardPosition: number;
+  badgeText: string; badgeColor: string;
 };
 
 const emptyDraft: Draft = {
@@ -26,6 +27,7 @@ const emptyDraft: Draft = {
   gradFrom: "#a855f7", gradTo: "#6366f1",
   isTopOffer: false, enabled: true, sortOrder: 0,
   cardPosition: 1,
+  badgeText: "", badgeColor: "#f59e0b",
 };
 
 function SurveysPage() {
@@ -116,6 +118,16 @@ function SurveyModal({ draft, onChange, onClose }: { draft: Draft; onChange: (d:
             </div>
           </FormField>
 
+          <FormField label="Upload Logo" full>
+            <label className="flex items-center gap-2 cursor-pointer rounded-xl bg-card/60 border border-dashed border-border px-3 py-2 text-sm hover:bg-card">
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const f = e.target.files?.[0]; if (!f) return;
+                const r = new FileReader(); r.onload = () => upd("logoUrl", String(r.result)); r.readAsDataURL(f);
+              }} />
+              <span className="text-muted-foreground">Choose image file (PNG, JPG, SVG)…</span>
+            </label>
+          </FormField>
+
           <FormField label="Logo Background">
             <input type="color" value={draft.logoBg} onChange={(e) => upd("logoBg", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
@@ -136,6 +148,13 @@ function SurveyModal({ draft, onChange, onClose }: { draft: Draft; onChange: (d:
             <input type="color" value={draft.gradTo} onChange={(e) => upd("gradTo", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
 
+          <FormField label="Badge Text">
+            <input value={draft.badgeText} onChange={(e) => upd("badgeText", e.target.value)} placeholder="e.g. NEW, HOT, 2X" maxLength={12} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
+          </FormField>
+          <FormField label="Badge Color">
+            <input type="color" value={draft.badgeColor} onChange={(e) => upd("badgeColor", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
+          </FormField>
+
           <div className="md:col-span-2 grid grid-cols-2 gap-3">
             <ToggleRow label="Top Offer" v={draft.isTopOffer} onChange={() => upd("isTopOffer", !draft.isTopOffer)} />
             <ToggleRow label="Enabled" v={draft.enabled} onChange={() => upd("enabled", !draft.enabled)} />
@@ -143,7 +162,10 @@ function SurveyModal({ draft, onChange, onClose }: { draft: Draft; onChange: (d:
 
           <div className="md:col-span-2 rounded-2xl border border-border p-3 overflow-hidden">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Live card preview</div>
-            <div className="h-24 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: `linear-gradient(135deg, ${draft.gradFrom}, ${draft.gradTo})` }}>
+            <div className="relative h-24 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: `linear-gradient(135deg, ${draft.gradFrom}, ${draft.gradTo})` }}>
+              {draft.badgeText && (
+                <span className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow" style={{ background: draft.badgeColor }}>{draft.badgeText}</span>
+              )}
               {draft.name || "Survey partner name"}
             </div>
           </div>
