@@ -37,17 +37,18 @@ function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const open = (m: "signin" | "signup") => { setAuthMode(m); setAuthOpen(true); };
+  const isEnabled = (value: unknown) => value === true || value === "true" || value === 1 || value === "1";
 
   const statsQ = useQuery({ queryKey: ["public-stats"], queryFn: publicAPI.stats });
   const settingsQ = useQuery({ queryKey: ["public-settings"], queryFn: publicAPI.settings });
   const partnersQ = useQuery({ queryKey: ["public-offerwalls"], queryFn: publicAPI.offerwalls });
   const stats = statsQ.data ?? { members: "—", xpPaid: "—", offers: "—", payouts: "—" };
   const settings = settingsQ.data ?? {};
-  const liveLeadsEnabled = settings.live_leads_enabled !== false;
+  const liveLeadsEnabled = !("live_leads_enabled" in settings) || isEnabled(settings.live_leads_enabled);
   const partnersRaw = partnersQ.data?.items ?? partnersQ.data?.offerwalls ?? partnersQ.data ?? [];
   const partners: ApiProvider[] = (Array.isArray(partnersRaw) ? partnersRaw : []).slice(0, 8);
 
-  if (settings.maintenance_mode) {
+  if (isEnabled(settings.maintenance_mode)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md rounded-3xl glass p-8 text-center shadow-card">
