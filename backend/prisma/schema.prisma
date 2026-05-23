@@ -1,0 +1,205 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  uuid            String    @unique @default(uuid())
+  username        String    @unique
+  email           String    @unique
+  passwordHash    String
+  avatarUrl       String?
+  balanceXp       Int       @default(0)
+  totalEarnedXp   Int       @default(0)
+  todayEarnedXp   Int       @default(0)
+  pendingXp       Int       @default(0)
+  role            String    @default("user")
+  referralCode    String    @unique
+  referredBy      Int?
+  streak          Int       @default(0)
+  lastDailyClaim  DateTime?
+  level           Int       @default(1)
+  country         String?
+  isPrivate       Boolean   @default(false)
+  isBanned        Boolean   @default(false)
+  banReason       String?
+  createdAt       DateTime  @default(now())
+  activities      Activity[]
+  cashouts        Cashout[]
+  notifications   Notification[]
+  promoUses       PromoUse[]
+  referralsGiven  Referral[] @relation("referrer")
+  referralsGot    Referral[] @relation("referred")
+  logs            Log[]
+}
+
+model Offerwall {
+  id              Int       @id @default(autoincrement())
+  name            String
+  slug            String    @unique
+  type            String    @default("offerwall")
+  logoUrl         String?
+  logoBgColor     String    @default("#1a1a2e")
+  logoSize        Int       @default(80)
+  iframeUrl       String    @db.Text
+  enabled         Boolean   @default(true)
+  isTopOffer      Boolean   @default(false)
+  bgGradientFrom  String    @default("#1a1a2e")
+  bgGradientTo   String     @default("#16213e")
+  sortOrder       Int       @default(0)
+  createdAt       DateTime  @default(now())
+}
+
+model TopOffer {
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String?   @db.Text
+  imageUrl        String?
+  offerUrl        String    @db.Text
+  networkName     String?
+  offerwallId     Int?
+  enabled         Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  createdAt       DateTime  @default(now())
+}
+
+model Activity {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  network         String
+  offerName       String
+  offerId         String    @default("")
+  xp              Int
+  payoutUsd       Float     @default(0)
+  transactionId   String
+  country         String    @default("")
+  ipAddress       String    @default("")
+  status          String    @default("valid")
+  matchedKeyword  String?
+  rawParams       String    @db.Text
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionId, network])
+  @@index([userId])
+  @@index([status])
+  @@index([network])
+}
+
+model Cashout {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  method          String
+  amountXp        Int
+  amountUsd       Float
+  accountDetails  String
+  status          String    @default("pending")
+  rejectReason    String?
+  reviewedBy      Int?
+  createdAt       DateTime  @default(now())
+  reviewedAt      DateTime?
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model PaymentMethod {
+  id              Int       @id @default(autoincrement())
+  name            String
+  iconUrl         String?
+  minXp           Int       @default(500)
+  feePercent      Float     @default(0.0)
+  processingTime  String    @default("Instant")
+  enabled         Boolean   @default(true)
+  sortOrder       Int       @default(0)
+}
+
+model PromoCode {
+  id              Int       @id @default(autoincrement())
+  code            String    @unique
+  rewardXp        Int
+  maxUses         Int       @default(0)
+  usesCount       Int       @default(0)
+  expiresAt       DateTime?
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  uses            PromoUse[]
+}
+
+model PromoUse {
+  id              Int       @id @default(autoincrement())
+  promoId         Int
+  userId          Int
+  usedAt          DateTime  @default(now())
+  promo           PromoCode @relation(fields: [promoId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promoId, userId])
+}
+
+model Referral {
+  id              Int       @id @default(autoincrement())
+  referrerId      Int
+  referredId      Int
+  xpAwarded       Int       @default(0)
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now())
+  referrer        User      @relation("referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred        User      @relation("referred", fields: [referredId], references: [id], onDelete: Cascade)
+}
+
+model Level {
+  id              Int       @id @default(autoincrement())
+  levelNumber     Int       @unique
+  name            String
+  xpRequired      Int
+  bonusXp         Int       @default(0)
+  badgeColor      String    @default("#CD7F32")
+  tier            String    @default("Bronze")
+}
+
+model Notification {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  type            String
+  title           String
+  body            String    @db.Text
+  read            Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Setting {
+  id              Int       @id @default(autoincrement())
+  key             String    @unique
+  value           String    @db.Text
+  updatedAt       DateTime  @updatedAt
+}
+
+model Log {
+  id              Int       @id @default(autoincrement())
+  userId          Int?
+  type            String
+  action          String
+  details         String?   @db.Text
+  ipAddress       String    @default("")
+  createdAt       DateTime  @default(now())
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+}
+
+model OfferPendingRule {
+  id              Int       @id @default(autoincrement())
+  keyword         String
+  note            String?
+  createdAt       DateTime  @default(now())
+}
