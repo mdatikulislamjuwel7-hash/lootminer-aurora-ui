@@ -9,7 +9,7 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { CountUpString } from "@/components/common/CountUp";
 import { Reveal } from "@/components/common/Reveal";
 import { publicAPI } from "@/lib/api";
-import { mockFAQs } from "@/data/mock";
+import { mockFAQs } from "@/data/faqs";
 import type { ApiProvider } from "@/lib/types";
 import { Diamond as DefaultProviderIcon } from "lucide-react";
 import {
