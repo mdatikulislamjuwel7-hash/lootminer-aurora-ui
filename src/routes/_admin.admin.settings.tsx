@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Toggle } from "@/components/admin/StatusBadge";
-import { mockSettings, postbackNetworks } from "@/data/mock";
+import { adminAPI } from "@/lib/api";
 import { Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,18 +12,36 @@ export const Route = createFileRoute("/_admin/admin/settings")({
   component: SettingsPage,
 });
 
-const BASE = "https://yourdomain.com/api/postback";
-
 function SettingsPage() {
-  const [s, setS] = useState(mockSettings);
-  const [nets, setNets] = useState(postbackNetworks);
+  const qc = useQueryClient();
+  const { data } = useQuery({ queryKey: ["admin", "settings"], queryFn: adminAPI.settings });
+  const [s, setS] = useState<any>({});
   const [confirm1, setConfirm1] = useState("");
   const [confirm2, setConfirm2] = useState("");
 
-  const set = <K extends keyof typeof s>(k: K, v: (typeof s)[K]) => setS({ ...s, [k]: v });
-  const tog = (k: keyof typeof s) => setS({ ...s, [k]: !s[k] } as typeof s);
+  useEffect(() => {
+    if (data?.settings) setS(data.settings);
+  }, [data]);
+
+  const nets: any[] = data?.networks ?? [];
+  const baseUrl = data?.postbackBaseUrl ?? `${typeof window !== "undefined" ? window.location.origin : ""}/api/postback`;
+
+  const set = <K extends string>(k: K, v: any) => setS({ ...s, [k]: v });
+  const tog = (k: string) => setS({ ...s, [k]: !s[k] });
 
   const copy = (url: string) => { navigator.clipboard?.writeText(url); toast.success("Postback URL copied"); };
+
+  const saveMut = useMutation({
+    mutationFn: () => adminAPI.saveSettings(s),
+    onSuccess: () => { toast.success("Settings saved"); qc.invalidateQueries({ queryKey: ["admin", "settings"] }); },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Save failed"),
+  });
+
+  const clearXpMut = useMutation({
+    mutationFn: () => adminAPI.clearTodayXp(),
+    onSuccess: () => { toast.success("Today's XP cleared"); setConfirm1(""); },
+    onError: () => toast.error("Failed"),
+  });
 
   return (
     <div className="space-y-6 pb-24">
@@ -30,59 +49,47 @@ function SettingsPage() {
 
       <Card title="XP & Rewards">
         <div className="grid md:grid-cols-2 gap-4">
-          <NumberField label="XP per USD" value={s.xpPerUsd} onChange={(v) => set("xpPerUsd", v)} />
-          <NumberField label="Signup Bonus XP" value={s.signupBonusXp} onChange={(v) => set("signupBonusXp", v)} />
-          <NumberField label="Referral Bonus XP" value={s.referralBonusXp} onChange={(v) => set("referralBonusXp", v)} />
-          <NumberField label="Daily Bonus Base XP" value={s.dailyBonusXp} onChange={(v) => set("dailyBonusXp", v)} />
-          <NumberField label="Minimum Cashout XP" value={s.minCashoutXp} onChange={(v) => set("minCashoutXp", v)} />
+          <NumberField label="XP per USD" value={s.xpPerUsd ?? 0} onChange={(v) => set("xpPerUsd", v)} />
+          <NumberField label="Signup Bonus XP" value={s.signupBonusXp ?? 0} onChange={(v) => set("signupBonusXp", v)} />
+          <NumberField label="Referral Bonus XP" value={s.referralBonusXp ?? 0} onChange={(v) => set("referralBonusXp", v)} />
+          <NumberField label="Daily Bonus Base XP" value={s.dailyBonusXp ?? 0} onChange={(v) => set("dailyBonusXp", v)} />
+          <NumberField label="Minimum Cashout XP" value={s.minCashoutXp ?? 0} onChange={(v) => set("minCashoutXp", v)} />
         </div>
       </Card>
 
       <Card title="Site Controls">
-        <ToggleRow label="Maintenance Mode" desc="When ON shows maintenance page to users" v={s.maintenanceMode} onChange={() => tog("maintenanceMode")} />
-        <ToggleRow label="Live Leads Ticker" desc="Show/hide the global leads ticker" v={s.liveLeadsEnabled} onChange={() => tog("liveLeadsEnabled")} />
-        <ToggleRow label="Referrals Enabled" desc="Enable the referral program" v={s.referralsEnabled} onChange={() => tog("referralsEnabled")} />
-        <ToggleRow label="Promo Codes Enabled" desc="Allow users to redeem codes" v={s.promoCodesEnabled} onChange={() => tog("promoCodesEnabled")} />
-        <ToggleRow label="New Signups Enabled" desc="Open registration to new users" v={s.signupOpen} onChange={() => tog("signupOpen")} />
+        <ToggleRow label="Maintenance Mode" desc="When ON shows maintenance page to users" v={!!s.maintenanceMode} onChange={() => tog("maintenanceMode")} />
+        <ToggleRow label="Live Leads Ticker" desc="Show/hide the global leads ticker" v={!!s.liveLeadsEnabled} onChange={() => tog("liveLeadsEnabled")} />
+        <ToggleRow label="Referrals Enabled" desc="Enable the referral program" v={!!s.referralsEnabled} onChange={() => tog("referralsEnabled")} />
+        <ToggleRow label="Promo Codes Enabled" desc="Allow users to redeem codes" v={!!s.promoCodesEnabled} onChange={() => tog("promoCodesEnabled")} />
+        <ToggleRow label="New Signups Enabled" desc="Open registration to new users" v={!!s.signupOpen} onChange={() => tog("signupOpen")} />
       </Card>
 
       <Card title="Fraud & Proxy Detection">
-        <ToggleRow label="Block VPN / Proxy traffic" desc="Reject earnings from detected VPNs and proxies" v={s.vpnBlocking} onChange={() => tog("vpnBlocking")} />
-        <ToggleRow label="Live Proxy-Change Detection" desc="Detect mid-session IP / proxy changes and re-verify" v={s.proxyChangeDetect} onChange={() => tog("proxyChangeDetect")} />
+        <ToggleRow label="Block VPN / Proxy traffic" desc="Reject earnings from detected VPNs and proxies" v={!!s.vpnBlocking} onChange={() => tog("vpnBlocking")} />
+        <ToggleRow label="Live Proxy-Change Detection" desc="Detect mid-session IP / proxy changes and re-verify" v={!!s.proxyChangeDetect} onChange={() => tog("proxyChangeDetect")} />
 
         <div className="rounded-2xl bg-card/60 border border-border p-3 space-y-3">
-          <ToggleRow label="Fraudlogix" desc="fraudlogix.com fraud scoring" v={s.fraudlogix} onChange={() => tog("fraudlogix")} />
-          <input
-            value={s.fraudlogixKey}
-            onChange={(e) => set("fraudlogixKey", e.target.value)}
-            placeholder="Fraudlogix API key"
-            className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono"
-            disabled={!s.fraudlogix}
-          />
+          <ToggleRow label="Fraudlogix" desc="fraudlogix.com fraud scoring" v={!!s.fraudlogix} onChange={() => tog("fraudlogix")} />
+          <input value={s.fraudlogixKey ?? ""} onChange={(e) => set("fraudlogixKey", e.target.value)} placeholder="Fraudlogix API key" className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono" disabled={!s.fraudlogix} />
         </div>
 
         <div className="rounded-2xl bg-card/60 border border-border p-3 space-y-3">
-          <ToggleRow label="IPQualityScore" desc="ipqualityscore.com fraud + proxy check" v={s.ipqs} onChange={() => tog("ipqs")} />
-          <input
-            value={s.ipqsKey}
-            onChange={(e) => set("ipqsKey", e.target.value)}
-            placeholder="IPQualityScore API key"
-            className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono"
-            disabled={!s.ipqs}
-          />
+          <ToggleRow label="IPQualityScore" desc="ipqualityscore.com fraud + proxy check" v={!!s.ipqs} onChange={() => tog("ipqs")} />
+          <input value={s.ipqsKey ?? ""} onChange={(e) => set("ipqsKey", e.target.value)} placeholder="IPQualityScore API key" className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono" disabled={!s.ipqs} />
         </div>
       </Card>
 
       <Card title="Postback Networks">
         <div className="space-y-3">
-          {nets.map(n => {
-            const url = `${BASE}/${n.slug}`;
+          {nets.map((n: any) => {
+            const url = `${baseUrl}/${n.slug}`;
             return (
-              <div key={n.id} className="rounded-2xl bg-card/60 border border-border p-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
+              <div key={n.id ?? n.slug} className="rounded-2xl bg-card/60 border border-border p-3 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <span className="font-semibold">{n.name}</span>
-                    <Toggle checked={n.enabled} onChange={() => setNets(arr => arr.map(x => x.id === n.id ? { ...x, enabled: !x.enabled } : x))} />
+                    <Toggle checked={!!n.enabled} />
                   </div>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 rounded-lg bg-background/60 border border-border px-3 py-1.5 text-xs font-mono text-muted-foreground truncate">{url}</code>
@@ -92,6 +99,7 @@ function SettingsPage() {
               </div>
             );
           })}
+          {nets.length === 0 && <div className="text-xs text-muted-foreground">No postback networks configured.</div>}
         </div>
         <p className="mt-4 text-xs text-muted-foreground flex items-start gap-2">
           <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
@@ -101,29 +109,14 @@ function SettingsPage() {
 
       <Card title="Danger Zone" danger>
         <div className="space-y-4">
-          <DangerRow
-            label="Clear Today's XP"
-            desc="Resets today_earned_xp for all users."
-            confirmText={confirm1}
-            setConfirmText={setConfirm1}
-            onExecute={() => { setConfirm1(""); toast.success("Today's XP cleared"); }}
-          />
-          <DangerRow
-            label="Clear All Logs"
-            desc="Permanently deletes log history."
-            confirmText={confirm2}
-            setConfirmText={setConfirm2}
-            onExecute={() => { setConfirm2(""); toast.success("All logs cleared"); }}
-          />
+          <DangerRow label="Clear Today's XP" desc="Resets today_earned_xp for all users." confirmText={confirm1} setConfirmText={setConfirm1} onExecute={() => clearXpMut.mutate()} loading={clearXpMut.isPending} />
+          <DangerRow label="Clear All Logs" desc="Permanently deletes log history." confirmText={confirm2} setConfirmText={setConfirm2} onExecute={() => { setConfirm2(""); toast.message("Endpoint not enabled"); }} />
         </div>
       </Card>
 
       <div className="fixed bottom-4 left-0 right-0 z-30 flex justify-center px-4 md:pl-[256px]">
-        <button
-          onClick={() => toast.success("Settings saved")}
-          className="rounded-2xl bg-gradient-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-glow-primary backdrop-blur-xl"
-        >
-          Save All Settings
+        <button onClick={() => saveMut.mutate()} disabled={saveMut.isPending} className="rounded-2xl bg-gradient-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-glow-primary backdrop-blur-xl disabled:opacity-60">
+          {saveMut.isPending ? "Saving…" : "Save All Settings"}
         </button>
       </div>
     </div>
@@ -160,7 +153,7 @@ function ToggleRow({ label, desc, v, onChange }: { label: string; desc?: string;
   );
 }
 
-function DangerRow({ label, desc, confirmText, setConfirmText, onExecute }: { label: string; desc: string; confirmText: string; setConfirmText: (v: string) => void; onExecute: () => void }) {
+function DangerRow({ label, desc, confirmText, setConfirmText, onExecute, loading }: { label: string; desc: string; confirmText: string; setConfirmText: (v: string) => void; onExecute: () => void; loading?: boolean }) {
   const ready = confirmText === "CONFIRM";
   return (
     <div className="rounded-2xl bg-destructive/5 border border-destructive/20 p-4 space-y-2">
@@ -171,18 +164,9 @@ function DangerRow({ label, desc, confirmText, setConfirmText, onExecute }: { la
         </div>
       </div>
       <div className="flex gap-2">
-        <input
-          value={confirmText}
-          onChange={(e) => setConfirmText(e.target.value)}
-          placeholder="Type CONFIRM"
-          className="flex-1 rounded-xl bg-background/60 border border-border px-3 py-2 text-sm font-mono"
-        />
-        <button
-          disabled={!ready}
-          onClick={onExecute}
-          className={`rounded-xl px-4 py-2 text-sm font-semibold ${ready ? "bg-destructive text-destructive-foreground" : "bg-card/60 text-muted-foreground cursor-not-allowed"}`}
-        >
-          Execute
+        <input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} placeholder="Type CONFIRM" className="flex-1 rounded-xl bg-background/60 border border-border px-3 py-2 text-sm font-mono" />
+        <button disabled={!ready || loading} onClick={onExecute} className={`rounded-xl px-4 py-2 text-sm font-semibold ${ready && !loading ? "bg-destructive text-destructive-foreground" : "bg-card/60 text-muted-foreground cursor-not-allowed"}`}>
+          {loading ? "…" : "Execute"}
         </button>
       </div>
     </div>

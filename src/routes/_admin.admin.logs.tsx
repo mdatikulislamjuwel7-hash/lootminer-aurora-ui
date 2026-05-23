@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/common/PageHeader";
-import { mockLogs } from "@/data/mock";
+import { adminAPI } from "@/lib/api";
 import { Download } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/logs")({
@@ -10,15 +11,6 @@ export const Route = createFileRoute("/_admin/admin/logs")({
 });
 
 const filters = ["All", "Auth", "Cashout", "Promo", "Referral", "Admin Action", "Postback"] as const;
-
-const typeMap: Record<string, string> = {
-  LOGIN: "Auth",
-  CASHOUT_REQ: "Cashout",
-  PROMO_USED: "Promo",
-  POSTBACK: "Postback",
-  VPN_BLOCK: "Admin Action",
-  API_ERROR: "Admin Action",
-};
 
 function tagColor(t: string) {
   switch (t) {
@@ -34,7 +26,22 @@ function tagColor(t: string) {
 
 function LogsPage() {
   const [f, setF] = useState<(typeof filters)[number]>("All");
-  const rows = useMemo(() => mockLogs.map(l => ({ ...l, kind: typeMap[l.action] ?? "Admin Action" })).filter(l => f === "All" || l.kind === f), [f]);
+  const [page, setPage] = useState(1);
+  const { data } = useQuery({
+    queryKey: ["admin", "logs", { f, page }],
+    queryFn: () => adminAPI.logs({ kind: f === "All" ? undefined : f, page }),
+  });
+  const rows: any[] = data?.logs ?? [];
+
+  const exportCsv = () => {
+    const headers = ["Time", "Type", "User", "Action", "Details", "IP"];
+    const lines = [headers.join(","), ...rows.map(l => [l.time ?? l.createdAt, l.kind, l.user, l.action, JSON.stringify(l.details ?? ""), l.ip].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))];
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `logs-${Date.now()}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="space-y-6">
@@ -42,7 +49,7 @@ function LogsPage() {
         eyebrow="Admin"
         title="System logs"
         action={
-          <button className="inline-flex items-center gap-1.5 rounded-xl glass border border-border px-4 py-2 text-sm font-semibold">
+          <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-xl glass border border-border px-4 py-2 text-sm font-semibold">
             <Download className="h-4 w-4" /> Export CSV
           </button>
         }
@@ -50,7 +57,7 @@ function LogsPage() {
 
       <div className="flex flex-wrap gap-2">
         {filters.map(x => (
-          <button key={x} onClick={() => setF(x)} className={`rounded-full px-3 py-1.5 text-xs border ${f === x ? "bg-gradient-accent text-accent-foreground border-transparent shadow-glow-accent" : "glass"}`}>{x}</button>
+          <button key={x} onClick={() => { setF(x); setPage(1); }} className={`rounded-full px-3 py-1.5 text-xs border ${f === x ? "bg-gradient-accent text-accent-foreground border-transparent shadow-glow-accent" : "glass"}`}>{x}</button>
         ))}
       </div>
 
@@ -62,16 +69,23 @@ function LogsPage() {
           <tbody className="divide-y divide-border">
             {rows.map(l => (
               <tr key={l.id} className="hover:bg-card/40">
-                <td className="p-3 px-5 font-mono text-xs text-muted-foreground whitespace-nowrap">{l.time}</td>
+                <td className="p-3 px-5 font-mono text-xs text-muted-foreground whitespace-nowrap">{l.time ?? l.createdAt}</td>
                 <td className="p-3"><span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${tagColor(l.kind)}`}>{l.kind}</span></td>
-                <td className="p-3 font-medium">{l.user}</td>
+                <td className="p-3 font-medium">{l.user ?? l.username ?? "—"}</td>
                 <td className="p-3 font-mono text-xs">{l.action}</td>
-                <td className="p-3 text-muted-foreground">{l.details}</td>
+                <td className="p-3 text-muted-foreground max-w-md truncate">{typeof l.details === "string" ? l.details : JSON.stringify(l.details ?? "")}</td>
                 <td className="p-3 font-mono text-xs text-muted-foreground">{l.ip}</td>
               </tr>
             ))}
+            {rows.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">No logs.</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-end gap-1">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg glass px-3 py-1 text-xs disabled:opacity-40">‹ Prev</button>
+        <span className="rounded-lg bg-gradient-primary text-primary-foreground px-3 py-1 text-xs">{page}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={rows.length < 50} className="rounded-lg glass px-3 py-1 text-xs disabled:opacity-40">Next ›</button>
       </div>
     </div>
   );
