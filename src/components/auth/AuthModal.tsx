@@ -4,18 +4,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
-import { Check, Diamond, Flame, Crown, Hexagon, Rocket, Star, Sparkles, Zap } from "lucide-react";
+import { Check, Shuffle } from "lucide-react";
 
-const avatars = [
-  { id: "diamond", icon: Diamond, color: "from-cyan-400 to-blue-500" },
-  { id: "flame", icon: Flame, color: "from-orange-400 to-rose-500" },
-  { id: "crown", icon: Crown, color: "from-amber-400 to-yellow-500" },
-  { id: "hex", icon: Hexagon, color: "from-violet-400 to-fuchsia-500" },
-  { id: "rocket", icon: Rocket, color: "from-emerald-400 to-teal-500" },
-  { id: "star", icon: Star, color: "from-pink-400 to-rose-500" },
-  { id: "sparkle", icon: Sparkles, color: "from-indigo-400 to-violet-500" },
-  { id: "zap", icon: Zap, color: "from-lime-400 to-green-500" },
-];
+const AVATAR_STYLE = "bottts-neutral";
+const dicebearUrl = (seed: string) =>
+  `https://api.dicebear.com/9.x/${AVATAR_STYLE}/svg?seed=${encodeURIComponent(seed)}&radius=20`;
+const randomSeed = () => Math.random().toString(36).slice(2, 10);
+const makeAvatars = () => Array.from({ length: 8 }, () => randomSeed());
 
 export function AuthModal({
   open, mode, onOpenChange,
