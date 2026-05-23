@@ -30,6 +30,7 @@ import { Route as AdminAdminPromosRouteImport } from './routes/_admin.admin.prom
 import { Route as AdminAdminPostbackLogsRouteImport } from './routes/_admin.admin.postback-logs'
 import { Route as AdminAdminPaymentsRouteImport } from './routes/_admin.admin.payments'
 import { Route as AdminAdminOfferwallsRouteImport } from './routes/_admin.admin.offerwalls'
+import { Route as AdminAdminOfferPendingRouteImport } from './routes/_admin.admin.offer-pending'
 import { Route as AdminAdminLogsRouteImport } from './routes/_admin.admin.logs'
 import { Route as AdminAdminLevelsRouteImport } from './routes/_admin.admin.levels'
 import { Route as AdminAdminLeadsRouteImport } from './routes/_admin.admin.leads'
@@ -138,6 +139,11 @@ const AdminAdminOfferwallsRoute = AdminAdminOfferwallsRouteImport.update({
   path: '/admin/offerwalls',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminOfferPendingRoute = AdminAdminOfferPendingRouteImport.update({
+  id: '/admin/offer-pending',
+  path: '/admin/offer-pending',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdminLogsRoute = AdminAdminLogsRouteImport.update({
   id: '/admin/logs',
   path: '/admin/logs',
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/admin/leads': typeof AdminAdminLeadsRoute
   '/admin/levels': typeof AdminAdminLevelsRoute
   '/admin/logs': typeof AdminAdminLogsRoute
+  '/admin/offer-pending': typeof AdminAdminOfferPendingRoute
   '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
   '/admin/payments': typeof AdminAdminPaymentsRoute
   '/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/admin/leads': typeof AdminAdminLeadsRoute
   '/admin/levels': typeof AdminAdminLevelsRoute
   '/admin/logs': typeof AdminAdminLogsRoute
+  '/admin/offer-pending': typeof AdminAdminOfferPendingRoute
   '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
   '/admin/payments': typeof AdminAdminPaymentsRoute
   '/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/_admin/admin/leads': typeof AdminAdminLeadsRoute
   '/_admin/admin/levels': typeof AdminAdminLevelsRoute
   '/_admin/admin/logs': typeof AdminAdminLogsRoute
+  '/_admin/admin/offer-pending': typeof AdminAdminOfferPendingRoute
   '/_admin/admin/offerwalls': typeof AdminAdminOfferwallsRoute
   '/_admin/admin/payments': typeof AdminAdminPaymentsRoute
   '/_admin/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/levels'
     | '/admin/logs'
+    | '/admin/offer-pending'
     | '/admin/offerwalls'
     | '/admin/payments'
     | '/admin/postback-logs'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/levels'
     | '/admin/logs'
+    | '/admin/offer-pending'
     | '/admin/offerwalls'
     | '/admin/payments'
     | '/admin/postback-logs'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/leads'
     | '/_admin/admin/levels'
     | '/_admin/admin/logs'
+    | '/_admin/admin/offer-pending'
     | '/_admin/admin/offerwalls'
     | '/_admin/admin/payments'
     | '/_admin/admin/postback-logs'
@@ -472,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminOfferwallsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/offer-pending': {
+      id: '/_admin/admin/offer-pending'
+      path: '/admin/offer-pending'
+      fullPath: '/admin/offer-pending'
+      preLoaderRoute: typeof AdminAdminOfferPendingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/admin/logs': {
       id: '/_admin/admin/logs'
       path: '/admin/logs'
@@ -508,6 +527,7 @@ interface AdminRouteChildren {
   AdminAdminLeadsRoute: typeof AdminAdminLeadsRoute
   AdminAdminLevelsRoute: typeof AdminAdminLevelsRoute
   AdminAdminLogsRoute: typeof AdminAdminLogsRoute
+  AdminAdminOfferPendingRoute: typeof AdminAdminOfferPendingRoute
   AdminAdminOfferwallsRoute: typeof AdminAdminOfferwallsRoute
   AdminAdminPaymentsRoute: typeof AdminAdminPaymentsRoute
   AdminAdminPostbackLogsRoute: typeof AdminAdminPostbackLogsRoute
@@ -524,6 +544,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminLeadsRoute: AdminAdminLeadsRoute,
   AdminAdminLevelsRoute: AdminAdminLevelsRoute,
   AdminAdminLogsRoute: AdminAdminLogsRoute,
+  AdminAdminOfferPendingRoute: AdminAdminOfferPendingRoute,
   AdminAdminOfferwallsRoute: AdminAdminOfferwallsRoute,
   AdminAdminPaymentsRoute: AdminAdminPaymentsRoute,
   AdminAdminPostbackLogsRoute: AdminAdminPostbackLogsRoute,
