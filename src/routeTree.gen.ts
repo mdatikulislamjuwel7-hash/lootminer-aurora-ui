@@ -21,7 +21,7 @@ import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppEarnRouteImport } from './routes/_app.earn'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppCashoutRouteImport } from './routes/_app.cashout'
-import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
 import { Route as AdminAdminUsersRouteImport } from './routes/_admin.admin.users'
 import { Route as AdminAdminTopOffersRouteImport } from './routes/_admin.admin.top-offers'
 import { Route as AdminAdminSurveysRouteImport } from './routes/_admin.admin.surveys'
@@ -93,75 +93,74 @@ const AppCashoutRoute = AppCashoutRouteImport.update({
   path: '/cashout',
   getParentRoute: () => AppRoute,
 } as any)
-const AdminAdminRoute = AdminAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminUsersRoute = AdminAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminTopOffersRoute = AdminAdminTopOffersRouteImport.update({
-  id: '/top-offers',
-  path: '/top-offers',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/top-offers',
+  path: '/admin/top-offers',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminSurveysRoute = AdminAdminSurveysRouteImport.update({
-  id: '/surveys',
-  path: '/surveys',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/surveys',
+  path: '/admin/surveys',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminSettingsRoute = AdminAdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminPromosRoute = AdminAdminPromosRouteImport.update({
-  id: '/promos',
-  path: '/promos',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/promos',
+  path: '/admin/promos',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminPostbackLogsRoute = AdminAdminPostbackLogsRouteImport.update({
-  id: '/postback-logs',
-  path: '/postback-logs',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/postback-logs',
+  path: '/admin/postback-logs',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminPaymentsRoute = AdminAdminPaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/payments',
+  path: '/admin/payments',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminOfferwallsRoute = AdminAdminOfferwallsRouteImport.update({
-  id: '/offerwalls',
-  path: '/offerwalls',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/offerwalls',
+  path: '/admin/offerwalls',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminLogsRoute = AdminAdminLogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/logs',
+  path: '/admin/logs',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminLevelsRoute = AdminAdminLevelsRouteImport.update({
-  id: '/levels',
-  path: '/levels',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/levels',
+  path: '/admin/levels',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminLeadsRoute = AdminAdminLeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/leads',
+  path: '/admin/leads',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdminCashoutsRoute = AdminAdminCashoutsRouteImport.update({
-  id: '/cashouts',
-  path: '/cashouts',
-  getParentRoute: () => AdminAdminRoute,
+  id: '/admin/cashouts',
+  path: '/admin/cashouts',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminAdminRouteWithChildren
   '/cashout': typeof AppCashoutRoute
   '/dashboard': typeof AppDashboardRoute
   '/earn': typeof AppEarnRoute
@@ -183,10 +182,10 @@ export interface FileRoutesByFullPath {
   '/admin/surveys': typeof AdminAdminSurveysRoute
   '/admin/top-offers': typeof AdminAdminTopOffersRoute
   '/admin/users': typeof AdminAdminUsersRoute
+  '/admin/': typeof AdminAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminAdminRouteWithChildren
   '/cashout': typeof AppCashoutRoute
   '/dashboard': typeof AppDashboardRoute
   '/earn': typeof AppEarnRoute
@@ -208,13 +207,13 @@ export interface FileRoutesByTo {
   '/admin/surveys': typeof AdminAdminSurveysRoute
   '/admin/top-offers': typeof AdminAdminTopOffersRoute
   '/admin/users': typeof AdminAdminUsersRoute
+  '/admin': typeof AdminAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
   '/_app': typeof AppRouteWithChildren
-  '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/_app/cashout': typeof AppCashoutRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/earn': typeof AppEarnRoute
@@ -236,12 +235,12 @@ export interface FileRoutesById {
   '/_admin/admin/surveys': typeof AdminAdminSurveysRoute
   '/_admin/admin/top-offers': typeof AdminAdminTopOffersRoute
   '/_admin/admin/users': typeof AdminAdminUsersRoute
+  '/_admin/admin/': typeof AdminAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/cashout'
     | '/dashboard'
     | '/earn'
@@ -263,10 +262,10 @@ export interface FileRouteTypes {
     | '/admin/surveys'
     | '/admin/top-offers'
     | '/admin/users'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/cashout'
     | '/dashboard'
     | '/earn'
@@ -288,12 +287,12 @@ export interface FileRouteTypes {
     | '/admin/surveys'
     | '/admin/top-offers'
     | '/admin/users'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_admin'
     | '/_app'
-    | '/_admin/admin'
     | '/_app/cashout'
     | '/_app/dashboard'
     | '/_app/earn'
@@ -315,6 +314,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/surveys'
     | '/_admin/admin/top-offers'
     | '/_admin/admin/users'
+    | '/_admin/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -409,101 +409,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCashoutRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_admin/admin': {
-      id: '/_admin/admin'
+    '/_admin/admin/': {
+      id: '/_admin/admin/'
       path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminAdminRouteImport
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminAdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_admin/admin/users': {
       id: '/_admin/admin/users'
-      path: '/users'
+      path: '/admin/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminAdminUsersRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/top-offers': {
       id: '/_admin/admin/top-offers'
-      path: '/top-offers'
+      path: '/admin/top-offers'
       fullPath: '/admin/top-offers'
       preLoaderRoute: typeof AdminAdminTopOffersRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/surveys': {
       id: '/_admin/admin/surveys'
-      path: '/surveys'
+      path: '/admin/surveys'
       fullPath: '/admin/surveys'
       preLoaderRoute: typeof AdminAdminSurveysRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/settings': {
       id: '/_admin/admin/settings'
-      path: '/settings'
+      path: '/admin/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminAdminSettingsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/promos': {
       id: '/_admin/admin/promos'
-      path: '/promos'
+      path: '/admin/promos'
       fullPath: '/admin/promos'
       preLoaderRoute: typeof AdminAdminPromosRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/postback-logs': {
       id: '/_admin/admin/postback-logs'
-      path: '/postback-logs'
+      path: '/admin/postback-logs'
       fullPath: '/admin/postback-logs'
       preLoaderRoute: typeof AdminAdminPostbackLogsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/payments': {
       id: '/_admin/admin/payments'
-      path: '/payments'
+      path: '/admin/payments'
       fullPath: '/admin/payments'
       preLoaderRoute: typeof AdminAdminPaymentsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/offerwalls': {
       id: '/_admin/admin/offerwalls'
-      path: '/offerwalls'
+      path: '/admin/offerwalls'
       fullPath: '/admin/offerwalls'
       preLoaderRoute: typeof AdminAdminOfferwallsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/logs': {
       id: '/_admin/admin/logs'
-      path: '/logs'
+      path: '/admin/logs'
       fullPath: '/admin/logs'
       preLoaderRoute: typeof AdminAdminLogsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/levels': {
       id: '/_admin/admin/levels'
-      path: '/levels'
+      path: '/admin/levels'
       fullPath: '/admin/levels'
       preLoaderRoute: typeof AdminAdminLevelsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/leads': {
       id: '/_admin/admin/leads'
-      path: '/leads'
+      path: '/admin/leads'
       fullPath: '/admin/leads'
       preLoaderRoute: typeof AdminAdminLeadsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
     '/_admin/admin/cashouts': {
       id: '/_admin/admin/cashouts'
-      path: '/cashouts'
+      path: '/admin/cashouts'
       fullPath: '/admin/cashouts'
       preLoaderRoute: typeof AdminAdminCashoutsRouteImport
-      parentRoute: typeof AdminAdminRoute
+      parentRoute: typeof AdminRoute
     }
   }
 }
 
-interface AdminAdminRouteChildren {
+interface AdminRouteChildren {
   AdminAdminCashoutsRoute: typeof AdminAdminCashoutsRoute
   AdminAdminLeadsRoute: typeof AdminAdminLeadsRoute
   AdminAdminLevelsRoute: typeof AdminAdminLevelsRoute
@@ -516,9 +516,10 @@ interface AdminAdminRouteChildren {
   AdminAdminSurveysRoute: typeof AdminAdminSurveysRoute
   AdminAdminTopOffersRoute: typeof AdminAdminTopOffersRoute
   AdminAdminUsersRoute: typeof AdminAdminUsersRoute
+  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
 }
 
-const AdminAdminRouteChildren: AdminAdminRouteChildren = {
+const AdminRouteChildren: AdminRouteChildren = {
   AdminAdminCashoutsRoute: AdminAdminCashoutsRoute,
   AdminAdminLeadsRoute: AdminAdminLeadsRoute,
   AdminAdminLevelsRoute: AdminAdminLevelsRoute,
@@ -531,18 +532,7 @@ const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminSurveysRoute: AdminAdminSurveysRoute,
   AdminAdminTopOffersRoute: AdminAdminTopOffersRoute,
   AdminAdminUsersRoute: AdminAdminUsersRoute,
-}
-
-const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
-  AdminAdminRouteChildren,
-)
-
-interface AdminRouteChildren {
-  AdminAdminRoute: typeof AdminAdminRouteWithChildren
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAdminRoute: AdminAdminRouteWithChildren,
+  AdminAdminIndexRoute: AdminAdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
