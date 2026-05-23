@@ -24,6 +24,8 @@ type Draft = {
   enabled: boolean;
   sortOrder: number;
   cardPosition: number;
+  badgeText: string;
+  badgeColor: string;
 };
 
 const emptyDraft: Draft = {
@@ -40,6 +42,8 @@ const emptyDraft: Draft = {
   enabled: true,
   sortOrder: 0,
   cardPosition: 1,
+  badgeText: "",
+  badgeColor: "#f59e0b",
 };
 
 function OfferwallsPage() {
