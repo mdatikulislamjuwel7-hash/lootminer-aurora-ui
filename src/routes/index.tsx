@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/background/AuroraBackground";
 import { Logo } from "@/components/common/Logo";
@@ -7,7 +8,10 @@ import { LiveLeadsTicker } from "@/components/landing/LiveLeadsTicker";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { CountUpString } from "@/components/common/CountUp";
 import { Reveal } from "@/components/common/Reveal";
-import { mockStats, mockFAQs, mockOfferwalls, mockSurveys } from "@/data/mock";
+import { publicAPI } from "@/lib/api";
+import { mockFAQs } from "@/data/mock";
+import type { ApiProvider } from "@/lib/types";
+import { Diamond as DefaultProviderIcon } from "lucide-react";
 import {
   ArrowRight, ChevronDown, Sparkles, ShieldCheck, Zap, Diamond,
   Users, Coins, Trophy, Wallet, Compass, CheckCircle2, Star,
@@ -34,17 +38,24 @@ function Landing() {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const open = (m: "signin" | "signup") => { setAuthMode(m); setAuthOpen(true); };
 
-  // 8 featured partner cards
-  const featured = [
-    mockOfferwalls.find(p => p.id === "adgem")!,
-    mockOfferwalls.find(p => p.id === "lootably")!,
-    mockSurveys.find(p => p.id === "bitlabs")!,
-    mockSurveys.find(p => p.id === "cpx")!,
-    mockOfferwalls.find(p => p.id === "monlix")!,
-    mockSurveys.find(p => p.id === "pollmine")!,
-    mockOfferwalls.find(p => p.id === "notik")!,
-    mockOfferwalls.find(p => p.id === "offery")!,
-  ].filter(Boolean);
+  const statsQ = useQuery({ queryKey: ["public-stats"], queryFn: publicAPI.stats });
+  const settingsQ = useQuery({ queryKey: ["public-settings"], queryFn: publicAPI.settings });
+  const partnersQ = useQuery({ queryKey: ["public-offerwalls"], queryFn: publicAPI.offerwalls });
+  const stats = statsQ.data ?? { members: "—", xpPaid: "—", offers: "—", payouts: "—" };
+  const settings = settingsQ.data ?? {};
+  const liveLeadsEnabled = settings.live_leads_enabled !== false;
+  const partners: ApiProvider[] = (partnersQ.data?.offerwalls ?? partnersQ.data ?? []).slice(0, 8);
+
+  if (settings.maintenance_mode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md rounded-3xl glass p-8 text-center shadow-card">
+          <h1 className="font-display text-2xl font-bold">We're sprucing things up</h1>
+          <p className="mt-2 text-sm text-muted-foreground">LootMiner is briefly down for maintenance. Check back soon.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
