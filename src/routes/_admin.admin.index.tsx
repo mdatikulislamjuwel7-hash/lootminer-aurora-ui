@@ -20,6 +20,12 @@ function AdminDash() {
     { l: "XP Paid Out", v: s.xpPaid.toLocaleString(), icon: Sparkles, tint: "from-violet-500/30 to-fuchsia-600/20", xp: true },
     { l: "Pending Cashouts", v: s.pendingCashouts.toString(), icon: Wallet, tint: "from-amber-500/30 to-orange-600/20" },
   ];
+  const earnings = [
+    { l: "Users — Today Earnings", v: s.userTodayEarnings.toLocaleString() + " XP", tint: "from-cyan-500/25 to-sky-600/15" },
+    { l: "Users — Monthly Earnings", v: s.userMonthlyEarnings.toLocaleString() + " XP", tint: "from-violet-500/25 to-indigo-600/15" },
+    { l: "My Revenue — Today", v: "$" + s.myTodayRevenue.toLocaleString(), tint: "from-emerald-500/25 to-green-600/15" },
+    { l: "My Revenue — This Month", v: "$" + s.myMonthlyRevenue.toLocaleString(), tint: "from-amber-500/25 to-orange-600/15" },
+  ];
 
   return (
     <div className="space-y-8">
@@ -37,6 +43,17 @@ function AdminDash() {
           </div>
         ))}
       </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {earnings.map((c) => (
+          <div key={c.l} className="relative overflow-hidden rounded-2xl glass p-4 shadow-card">
+            <div className={`absolute inset-0 bg-gradient-to-br ${c.tint} opacity-60 pointer-events-none`} />
+            <div className="relative text-[11px] uppercase tracking-widest text-muted-foreground">{c.l}</div>
+            <div className="relative mt-2 font-display text-xl font-bold tabular-nums">{c.v}</div>
+          </div>
+        ))}
+      </div>
+
 
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="rounded-3xl glass p-5 shadow-card">
