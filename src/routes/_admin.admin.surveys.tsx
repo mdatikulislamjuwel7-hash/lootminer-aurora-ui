@@ -12,18 +12,20 @@ export const Route = createFileRoute("/_admin/admin/surveys")({
 
 type Draft = {
   name: string; slug: string;
-  logoUrl: string; logoBg: string;
+  logoUrl: string; logoBg: string; logoSize: number;
   iframeUrl: string;
   gradFrom: string; gradTo: string;
   isTopOffer: boolean; enabled: boolean; sortOrder: number;
+  cardPosition: number;
 };
 
 const emptyDraft: Draft = {
   name: "", slug: "",
-  logoUrl: "", logoBg: "#7c3aed",
+  logoUrl: "", logoBg: "#7c3aed", logoSize: 40,
   iframeUrl: "",
   gradFrom: "#a855f7", gradTo: "#6366f1",
   isTopOffer: false, enabled: true, sortOrder: 0,
+  cardPosition: 1,
 };
 
 function SurveysPage() {
@@ -117,10 +119,16 @@ function SurveyModal({ draft, onChange, onClose }: { draft: Draft; onChange: (d:
           <FormField label="Logo Background">
             <input type="color" value={draft.logoBg} onChange={(e) => upd("logoBg", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
-          <FormField label="Iframe URL">
+          <FormField label={`Logo Size (${draft.logoSize}px)`}>
+            <input type="range" min={24} max={96} value={draft.logoSize} onChange={(e) => upd("logoSize", +e.target.value)} className="w-full accent-primary" />
+          </FormField>
+          <FormField label="Iframe URL" full>
             <input value={draft.iframeUrl} onChange={(e) => upd("iframeUrl", e.target.value)} placeholder="https://…" className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </FormField>
 
+          <FormField label="Card Position #">
+            <input type="number" min={1} value={draft.cardPosition} onChange={(e) => upd("cardPosition", +e.target.value)} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
+          </FormField>
           <FormField label="Card Gradient From">
             <input type="color" value={draft.gradFrom} onChange={(e) => upd("gradFrom", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>

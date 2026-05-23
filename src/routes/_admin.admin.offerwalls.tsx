@@ -16,12 +16,14 @@ type Draft = {
   type: "offerwall" | "survey";
   logoUrl: string;
   logoBg: string;
+  logoSize: number;
   iframeUrl: string;
   gradFrom: string;
   gradTo: string;
   isTopOffer: boolean;
   enabled: boolean;
   sortOrder: number;
+  cardPosition: number;
 };
 
 const emptyDraft: Draft = {
@@ -30,12 +32,14 @@ const emptyDraft: Draft = {
   type: "offerwall",
   logoUrl: "",
   logoBg: "#0ea5e9",
+  logoSize: 40,
   iframeUrl: "",
   gradFrom: "#22d3ee",
   gradTo: "#6366f1",
   isTopOffer: false,
   enabled: true,
   sortOrder: 0,
+  cardPosition: 1,
 };
 
 function OfferwallsPage() {
@@ -143,10 +147,16 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
           <FormField label="Logo Background">
             <input type="color" value={draft.logoBg} onChange={(e) => upd("logoBg", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
-          <FormField label="Iframe URL">
+          <FormField label={`Logo Size (${draft.logoSize}px)`}>
+            <input type="range" min={24} max={96} value={draft.logoSize} onChange={(e) => upd("logoSize", +e.target.value)} className="w-full accent-primary" />
+          </FormField>
+          <FormField label="Iframe URL" full>
             <input value={draft.iframeUrl} onChange={(e) => upd("iframeUrl", e.target.value)} placeholder="https://…" className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </FormField>
 
+          <FormField label="Card Position #">
+            <input type="number" min={1} value={draft.cardPosition} onChange={(e) => upd("cardPosition", +e.target.value)} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
+          </FormField>
           <FormField label="Card Gradient From">
             <input type="color" value={draft.gradFrom} onChange={(e) => upd("gradFrom", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
