@@ -44,7 +44,7 @@ export function AuthModal({
     e.preventDefault();
     setErr(null); setBusy(true);
     try {
-      await register({ username, email, password, avatar: selected });
+      await register({ username, email, password, avatar: dicebearUrl(selected) });
       toast.success("Account created");
       onOpenChange(false);
       nav({ to: "/dashboard" });
