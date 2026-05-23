@@ -255,11 +255,63 @@ export const mockLevels = Array.from({ length: 15 }, (_, i) => ({
 export const mockSettings = {
   xpPerUsd: 1000,
   signupBonusXp: 500,
+  referralBonusXp: 500,
+  dailyBonusXp: 100,
+  minCashoutXp: 500,
   maintenanceMode: false,
   liveLeadsEnabled: true,
+  referralsEnabled: true,
+  promoCodesEnabled: true,
+  signupOpen: true,
   vpnBlocking: true,
   fraudlogix: false,
   ipqs: false,
-  signupOpen: true,
   proxyChangeDetect: true,
 };
+
+/* ───────── postbacks ───────── */
+export const postbackNetworks = [
+  { id: "cpx", name: "CPX Research", slug: "cpx", enabled: true },
+  { id: "playtimeads", name: "PlaytimeAds", slug: "playtimeads", enabled: true },
+  { id: "pixylabs", name: "Pixylabs", slug: "pixylabs", enabled: true },
+  { id: "vortexwall", name: "Vortexwall", slug: "vortexwall", enabled: true },
+  { id: "notik", name: "Notik", slug: "notik", enabled: true },
+  { id: "pubscale", name: "Pubscale", slug: "pubscale", enabled: true },
+  { id: "adswedmedia", name: "Adswedmedia", slug: "adswedmedia", enabled: true },
+];
+
+export const mockPostbacks = Array.from({ length: 22 }, (_, i) => {
+  const net = postbackNetworks[i % postbackNetworks.length];
+  const statuses = ["Valid", "Valid", "Valid", "Duplicate", "Reversed", "Failed"] as const;
+  return {
+    id: i + 1,
+    time: `2026-05-${(i % 27) + 1} 1${i % 9}:${String((i * 7) % 60).padStart(2, "0")}`,
+    network: net.name,
+    networkSlug: net.slug,
+    user: fakeNames[i % fakeNames.length],
+    offer: ["Survey 1284", "App install Coin Master", "Trial sub", "Sign-up + verify", "Game level 10"][i % 5],
+    xp: 250 + (i % 9) * 380,
+    usd: ((250 + (i % 9) * 380) / 1000).toFixed(2),
+    txId: `tx_${Math.random().toString(36).slice(2, 12)}`,
+    ip: `192.0.${(i * 7) % 255}.${(i * 13) % 255}`,
+    status: statuses[i % statuses.length],
+    credited: i % 6 < 3,
+  };
+});
+
+export const mockPostbackStats = {
+  total: 4218,
+  valid: 3940,
+  duplicate: 184,
+  reversed: 94,
+};
+
+/* ───────── admin payment methods ───────── */
+export const mockAdminPayments = [
+  { id: "paypal", name: "PayPal", icon: Wallet, minXp: 500, fee: 0, time: "Instant", enabled: true, gradient: "from-blue-500/40 to-cyan-500/30" },
+  { id: "btc", name: "Bitcoin", icon: Coins, minXp: 1000, fee: 2, time: "~30 min", enabled: true, gradient: "from-amber-500/40 to-orange-500/30" },
+  { id: "amazon", name: "Amazon Gift Card", icon: Gift, minXp: 300, fee: 0, time: "1–24 hrs", enabled: true, gradient: "from-orange-500/40 to-yellow-500/30" },
+  { id: "bank", name: "Bank Transfer", icon: ShieldCheck, minXp: 2500, fee: 1, time: "1–3 days", enabled: false, gradient: "from-indigo-500/40 to-violet-500/30" },
+  { id: "usdt", name: "USDT (TRC20)", icon: Diamond, minXp: 1000, fee: 1, time: "~10 min", enabled: true, gradient: "from-emerald-500/40 to-teal-500/30" },
+  { id: "visa", name: "Visa Prepaid", icon: Award, minXp: 5000, fee: 3, time: "2–5 days", enabled: false, gradient: "from-violet-500/40 to-fuchsia-500/30" },
+];
