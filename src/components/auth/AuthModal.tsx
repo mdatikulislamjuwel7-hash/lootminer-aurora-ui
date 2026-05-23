@@ -95,18 +95,35 @@ export function AuthModal({
             ) : (
               <form onSubmit={handleSignUp} className="mt-5 space-y-4">
                 <div>
-                  <div className="font-display text-sm font-semibold">Choose your avatar</div>
-                  <p className="text-xs text-muted-foreground">Pick a profile badge</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-display text-sm font-semibold">Choose your avatar</div>
+                      <p className="text-xs text-muted-foreground">Pick one or shuffle</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = makeAvatars();
+                        setAvatars(next);
+                        setSelected(next[0]);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" /> Shuffle
+                    </button>
+                  </div>
                   <div className="mt-3 grid grid-cols-4 gap-2">
-                    {avatars.map((a) => {
-                      const Icon = a.icon;
-                      const isSel = selected === a.id;
+                    {avatars.map((seed) => {
+                      const isSel = selected === seed;
                       return (
-                        <button key={a.id} type="button" onClick={() => setSelected(a.id)}
-                          className={`group relative aspect-square rounded-2xl border transition ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}>
-                          <div className={`absolute inset-1 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center`}>
-                            <Icon className="h-5 w-5 text-white" />
-                          </div>
+                        <button key={seed} type="button" onClick={() => setSelected(seed)}
+                          className={`group relative aspect-square rounded-2xl border transition overflow-hidden ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}>
+                          <img
+                            src={dicebearUrl(seed)}
+                            alt="avatar"
+                            loading="lazy"
+                            className="absolute inset-1 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20"
+                          />
                           {isSel && (
                             <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-primary shadow-glow-primary text-primary-foreground">
                               <Check className="h-3 w-3" />
