@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import { Users, Sparkles, Wallet, TrendingUp, Check, X, Radio } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/admin")({
+export const Route = createFileRoute("/_admin/admin/")({
   head: () => ({ meta: [{ title: "Admin Dashboard — LootMiner" }] }),
   component: AdminDash,
 });
