@@ -27,6 +27,8 @@ import { Route as AdminAdminTopOffersRouteImport } from './routes/_admin.admin.t
 import { Route as AdminAdminSurveysRouteImport } from './routes/_admin.admin.surveys'
 import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.settings'
 import { Route as AdminAdminPromosRouteImport } from './routes/_admin.admin.promos'
+import { Route as AdminAdminPostbackLogsRouteImport } from './routes/_admin.admin.postback-logs'
+import { Route as AdminAdminPaymentsRouteImport } from './routes/_admin.admin.payments'
 import { Route as AdminAdminOfferwallsRouteImport } from './routes/_admin.admin.offerwalls'
 import { Route as AdminAdminLogsRouteImport } from './routes/_admin.admin.logs'
 import { Route as AdminAdminLevelsRouteImport } from './routes/_admin.admin.levels'
@@ -121,6 +123,16 @@ const AdminAdminPromosRoute = AdminAdminPromosRouteImport.update({
   path: '/promos',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminPostbackLogsRoute = AdminAdminPostbackLogsRouteImport.update({
+  id: '/postback-logs',
+  path: '/postback-logs',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminPaymentsRoute = AdminAdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminOfferwallsRoute = AdminAdminOfferwallsRouteImport.update({
   id: '/offerwalls',
   path: '/offerwalls',
@@ -164,6 +176,8 @@ export interface FileRoutesByFullPath {
   '/admin/levels': typeof AdminAdminLevelsRoute
   '/admin/logs': typeof AdminAdminLogsRoute
   '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/admin/payments': typeof AdminAdminPaymentsRoute
+  '/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
   '/admin/promos': typeof AdminAdminPromosRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
   '/admin/surveys': typeof AdminAdminSurveysRoute
@@ -187,6 +201,8 @@ export interface FileRoutesByTo {
   '/admin/levels': typeof AdminAdminLevelsRoute
   '/admin/logs': typeof AdminAdminLogsRoute
   '/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/admin/payments': typeof AdminAdminPaymentsRoute
+  '/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
   '/admin/promos': typeof AdminAdminPromosRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
   '/admin/surveys': typeof AdminAdminSurveysRoute
@@ -213,6 +229,8 @@ export interface FileRoutesById {
   '/_admin/admin/levels': typeof AdminAdminLevelsRoute
   '/_admin/admin/logs': typeof AdminAdminLogsRoute
   '/_admin/admin/offerwalls': typeof AdminAdminOfferwallsRoute
+  '/_admin/admin/payments': typeof AdminAdminPaymentsRoute
+  '/_admin/admin/postback-logs': typeof AdminAdminPostbackLogsRoute
   '/_admin/admin/promos': typeof AdminAdminPromosRoute
   '/_admin/admin/settings': typeof AdminAdminSettingsRoute
   '/_admin/admin/surveys': typeof AdminAdminSurveysRoute
@@ -238,6 +256,8 @@ export interface FileRouteTypes {
     | '/admin/levels'
     | '/admin/logs'
     | '/admin/offerwalls'
+    | '/admin/payments'
+    | '/admin/postback-logs'
     | '/admin/promos'
     | '/admin/settings'
     | '/admin/surveys'
@@ -261,6 +281,8 @@ export interface FileRouteTypes {
     | '/admin/levels'
     | '/admin/logs'
     | '/admin/offerwalls'
+    | '/admin/payments'
+    | '/admin/postback-logs'
     | '/admin/promos'
     | '/admin/settings'
     | '/admin/surveys'
@@ -286,6 +308,8 @@ export interface FileRouteTypes {
     | '/_admin/admin/levels'
     | '/_admin/admin/logs'
     | '/_admin/admin/offerwalls'
+    | '/_admin/admin/payments'
+    | '/_admin/admin/postback-logs'
     | '/_admin/admin/promos'
     | '/_admin/admin/settings'
     | '/_admin/admin/surveys'
@@ -427,6 +451,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminPromosRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/postback-logs': {
+      id: '/_admin/admin/postback-logs'
+      path: '/postback-logs'
+      fullPath: '/admin/postback-logs'
+      preLoaderRoute: typeof AdminAdminPostbackLogsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/payments': {
+      id: '/_admin/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminAdminPaymentsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/offerwalls': {
       id: '/_admin/admin/offerwalls'
       path: '/offerwalls'
@@ -471,6 +509,8 @@ interface AdminAdminRouteChildren {
   AdminAdminLevelsRoute: typeof AdminAdminLevelsRoute
   AdminAdminLogsRoute: typeof AdminAdminLogsRoute
   AdminAdminOfferwallsRoute: typeof AdminAdminOfferwallsRoute
+  AdminAdminPaymentsRoute: typeof AdminAdminPaymentsRoute
+  AdminAdminPostbackLogsRoute: typeof AdminAdminPostbackLogsRoute
   AdminAdminPromosRoute: typeof AdminAdminPromosRoute
   AdminAdminSettingsRoute: typeof AdminAdminSettingsRoute
   AdminAdminSurveysRoute: typeof AdminAdminSurveysRoute
@@ -484,6 +524,8 @@ const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminLevelsRoute: AdminAdminLevelsRoute,
   AdminAdminLogsRoute: AdminAdminLogsRoute,
   AdminAdminOfferwallsRoute: AdminAdminOfferwallsRoute,
+  AdminAdminPaymentsRoute: AdminAdminPaymentsRoute,
+  AdminAdminPostbackLogsRoute: AdminAdminPostbackLogsRoute,
   AdminAdminPromosRoute: AdminAdminPromosRoute,
   AdminAdminSettingsRoute: AdminAdminSettingsRoute,
   AdminAdminSurveysRoute: AdminAdminSurveysRoute,
