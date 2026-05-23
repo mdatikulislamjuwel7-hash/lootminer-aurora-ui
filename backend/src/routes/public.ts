@@ -39,8 +39,8 @@ router.get('/offerwalls', async (_req, res) => {
 
 router.get('/settings', async (_req, res) => {
   const items = await prisma.setting.findMany({ where: { key: { in: ['maintenance_mode', 'live_leads_enabled'] } } });
-  const out: Record<string, string> = {};
-  for (const s of items) out[s.key] = s.value;
+  const out: Record<string, boolean> = {};
+  for (const s of items) out[s.key] = s.value === 'true' || s.value === '1';
   res.json(out);
 });
 
