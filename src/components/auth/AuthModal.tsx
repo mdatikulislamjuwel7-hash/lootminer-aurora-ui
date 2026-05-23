@@ -6,9 +6,9 @@ import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
 import { Check, Shuffle } from "lucide-react";
 
-const AVATAR_STYLE = "bottts-neutral";
+const AVATAR_STYLE = "avataaars";
 const dicebearUrl = (seed: string) =>
-  `https://api.dicebear.com/9.x/${AVATAR_STYLE}/svg?seed=${encodeURIComponent(seed)}&radius=20`;
+  `https://api.dicebear.com/9.x/${AVATAR_STYLE}/svg?seed=${encodeURIComponent(seed)}`;
 const randomSeed = () => Math.random().toString(36).slice(2, 10);
 const makeAvatars = () => Array.from({ length: 8 }, () => randomSeed());
 
