@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/common/PageHeader";
-import { mockFAQs } from "@/data/mock";
+import { mockFAQs } from "@/data/faqs";
 import { ChevronDown, Mail, MessageCircle, Search, Rocket, Sparkles, Wallet, User } from "lucide-react";
 
 export const Route = createFileRoute("/_app/support")({
