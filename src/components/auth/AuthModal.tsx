@@ -18,7 +18,8 @@ export function AuthModal({
   const nav = useNavigate();
   const { login, register } = useAuth();
   const [tab, setTab] = useState<"signin" | "signup">(mode);
-  const [selected, setSelected] = useState("diamond");
+  const [avatars, setAvatars] = useState<string[]>(() => makeAvatars());
+  const [selected, setSelected] = useState<string>(avatars[0]);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
