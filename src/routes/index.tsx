@@ -44,7 +44,8 @@ function Landing() {
   const stats = statsQ.data ?? { members: "—", xpPaid: "—", offers: "—", payouts: "—" };
   const settings = settingsQ.data ?? {};
   const liveLeadsEnabled = settings.live_leads_enabled !== false;
-  const partners: ApiProvider[] = (partnersQ.data?.offerwalls ?? partnersQ.data ?? []).slice(0, 8);
+  const partnersRaw = partnersQ.data?.items ?? partnersQ.data?.offerwalls ?? partnersQ.data ?? [];
+  const partners: ApiProvider[] = (Array.isArray(partnersRaw) ? partnersRaw : []).slice(0, 8);
 
   if (settings.maintenance_mode) {
     return (
