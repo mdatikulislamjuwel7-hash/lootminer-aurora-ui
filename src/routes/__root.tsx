@@ -7,8 +7,6 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { Toaster } from "sonner";
-import { AuthProvider } from "@/lib/auth";
 
 import appCss from "../styles.css?url";
 
@@ -79,9 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Premium rewards platform for gamers. Complete offers, earn coins, cash out instantly." },
       { name: "author", content: "LootMiner" },
       { property: "og:title", content: "LootMiner — Earn. Cash out. Repeat." },
-      { property: "og:description", content: "The premium rewards platform for gamers." },
+      { property: "og:description", content: "Premium rewards platform for gamers. Complete offers, earn coins, cash out instantly." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "LootMiner — Earn. Cash out. Repeat." },
+      { name: "twitter:description", content: "Premium rewards platform for gamers. Complete offers, earn coins, cash out instantly." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b64fd089-797e-4450-ad2c-01c58e51cadd/id-preview-7311c166--49155917-1e73-40c5-ad57-6f620fc03ca5.lovable.app-1779556210459.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b64fd089-797e-4450-ad2c-01c58e51cadd/id-preview-7311c166--49155917-1e73-40c5-ad57-6f620fc03ca5.lovable.app-1779556210459.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -117,10 +119,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster richColors position="top-right" />
-      </AuthProvider>
+      <Outlet />
     </QueryClientProvider>
   );
 }
