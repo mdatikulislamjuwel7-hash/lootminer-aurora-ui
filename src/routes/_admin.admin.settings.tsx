@@ -46,6 +46,33 @@ function SettingsPage() {
         <ToggleRow label="New Signups Enabled" desc="Open registration to new users" v={s.signupOpen} onChange={() => tog("signupOpen")} />
       </Card>
 
+      <Card title="Fraud & Proxy Detection">
+        <ToggleRow label="Block VPN / Proxy traffic" desc="Reject earnings from detected VPNs and proxies" v={s.vpnBlocking} onChange={() => tog("vpnBlocking")} />
+        <ToggleRow label="Live Proxy-Change Detection" desc="Detect mid-session IP / proxy changes and re-verify" v={s.proxyChangeDetect} onChange={() => tog("proxyChangeDetect")} />
+
+        <div className="rounded-2xl bg-card/60 border border-border p-3 space-y-3">
+          <ToggleRow label="Fraudlogix" desc="fraudlogix.com fraud scoring" v={s.fraudlogix} onChange={() => tog("fraudlogix")} />
+          <input
+            value={s.fraudlogixKey}
+            onChange={(e) => set("fraudlogixKey", e.target.value)}
+            placeholder="Fraudlogix API key"
+            className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono"
+            disabled={!s.fraudlogix}
+          />
+        </div>
+
+        <div className="rounded-2xl bg-card/60 border border-border p-3 space-y-3">
+          <ToggleRow label="IPQualityScore" desc="ipqualityscore.com fraud + proxy check" v={s.ipqs} onChange={() => tog("ipqs")} />
+          <input
+            value={s.ipqsKey}
+            onChange={(e) => set("ipqsKey", e.target.value)}
+            placeholder="IPQualityScore API key"
+            className="w-full rounded-lg bg-background/60 border border-border px-3 py-2 text-sm font-mono"
+            disabled={!s.ipqs}
+          />
+        </div>
+      </Card>
+
       <Card title="Postback Networks">
         <div className="space-y-3">
           {nets.map(n => {
