@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Toggle } from "@/components/admin/StatusBadge";
-import { mockOfferwalls, mockSurveys, type Provider } from "@/data/mock";
+import { adminAPI } from "@/lib/api";
 import { Pencil, Trash2, Plus, X, Flame } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/offerwalls")({
@@ -11,44 +13,66 @@ export const Route = createFileRoute("/_admin/admin/offerwalls")({
 });
 
 type Draft = {
-  name: string;
-  slug: string;
-  type: "offerwall" | "survey";
-  logoUrl: string;
-  logoBg: string;
-  logoSize: number;
+  id?: number;
+  name: string; slug: string; type: "offerwall" | "survey";
+  logoUrl: string; logoBg: string; logoSize: number;
   iframeUrl: string;
-  gradFrom: string;
-  gradTo: string;
-  isTopOffer: boolean;
-  enabled: boolean;
-  sortOrder: number;
-  cardPosition: number;
-  badgeText: string;
-  badgeColor: string;
+  gradFrom: string; gradTo: string;
+  isTopOffer: boolean; enabled: boolean; sortOrder: number;
+  cardPosition: number; badgeText: string; badgeColor: string;
 };
 
 const emptyDraft: Draft = {
-  name: "",
-  slug: "",
-  type: "offerwall",
-  logoUrl: "",
-  logoBg: "#0ea5e9",
-  logoSize: 40,
+  name: "", slug: "", type: "offerwall",
+  logoUrl: "", logoBg: "#0ea5e9", logoSize: 40,
   iframeUrl: "",
-  gradFrom: "#22d3ee",
-  gradTo: "#6366f1",
-  isTopOffer: false,
-  enabled: true,
-  sortOrder: 0,
-  cardPosition: 1,
-  badgeText: "",
-  badgeColor: "#f59e0b",
+  gradFrom: "#22d3ee", gradTo: "#6366f1",
+  isTopOffer: false, enabled: true, sortOrder: 0,
+  cardPosition: 1, badgeText: "", badgeColor: "#f59e0b",
 };
 
 function OfferwallsPage() {
+  const qc = useQueryClient();
   const [modal, setModal] = useState<Draft | null>(null);
-  const all: Provider[] = [...mockOfferwalls, ...mockSurveys];
+
+  const { data: ow } = useQuery({ queryKey: ["admin", "offerwalls"], queryFn: adminAPI.offerwalls });
+  const { data: sv } = useQuery({ queryKey: ["admin", "surveys"], queryFn: adminAPI.surveys });
+  const all: any[] = [...(ow?.offerwalls ?? []), ...(sv?.surveys ?? [])];
+
+  const saveMut = useMutation({
+    mutationFn: (d: Draft) => {
+      const api = d.type === "survey"
+        ? (d.id ? adminAPI.editSurvey(d.id, d) : adminAPI.createSurvey(d))
+        : (d.id ? adminAPI.editOfferwall(d.id, d) : adminAPI.createOfferwall(d));
+      return api;
+    },
+    onSuccess: () => {
+      toast.success("Provider saved");
+      qc.invalidateQueries({ queryKey: ["admin", "offerwalls"] });
+      qc.invalidateQueries({ queryKey: ["admin", "surveys"] });
+      setModal(null);
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Save failed"),
+  });
+
+  const delMut = useMutation({
+    mutationFn: ({ id, type }: { id: number; type: string }) => type === "survey" ? adminAPI.deleteSurvey(id) : adminAPI.deleteOfferwall(id),
+    onSuccess: () => {
+      toast.success("Deleted");
+      qc.invalidateQueries({ queryKey: ["admin", "offerwalls"] });
+      qc.invalidateQueries({ queryKey: ["admin", "surveys"] });
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Delete failed"),
+  });
+
+  const toggleEnabled = (p: any) => {
+    if (p.type === "survey") adminAPI.editSurvey(p.id, { enabled: !p.enabled }).then(() => qc.invalidateQueries({ queryKey: ["admin", "surveys"] }));
+    else adminAPI.editOfferwall(p.id, { enabled: !p.enabled }).then(() => qc.invalidateQueries({ queryKey: ["admin", "offerwalls"] }));
+  };
+  const toggleTop = (p: any) => {
+    if (p.type === "survey") adminAPI.editSurvey(p.id, { isTopOffer: !p.isTopOffer }).then(() => qc.invalidateQueries({ queryKey: ["admin", "surveys"] }));
+    else adminAPI.editOfferwall(p.id, { isTopOffer: !p.isTopOffer }).then(() => qc.invalidateQueries({ queryKey: ["admin", "offerwalls"] }));
+  };
 
   return (
     <div className="space-y-6">
@@ -73,58 +97,56 @@ function OfferwallsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {all.map((p, i) => {
-                const Icon = p.icon;
-                return (
-                  <tr key={p.id} className="hover:bg-card/40">
-                    <td className="p-3 px-4">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${p.gradient} border border-border shadow-card`}>
-                        <Icon className="h-5 w-5 text-foreground" />
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <div className="font-medium">{p.name}</div>
-                      <div className="font-mono text-[10px] text-muted-foreground">{p.slug}</div>
-                    </td>
-                    <td className="p-3">
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${p.type === "survey" ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/30" : "bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/30"}`}>{p.type}</span>
-                    </td>
-                    <td className="p-3"><Toggle checked={p.enabled} /></td>
-                    <td className="p-3"><Toggle checked={!!p.isTopOffer} /></td>
-                    <td className="p-3 tabular-nums text-muted-foreground">{i + 1}</td>
-                    <td className="p-3 px-4">
-                      <div className="inline-flex gap-1">
-                        <button onClick={() => setModal({ ...emptyDraft, name: p.name, slug: p.slug, type: p.type, iframeUrl: p.iframeUrl, isTopOffer: !!p.isTopOffer, enabled: p.enabled })} className="rounded-lg bg-card/60 hover:bg-card p-1.5"><Pencil className="h-3.5 w-3.5" /></button>
-                        <button className="rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 p-1.5"><Trash2 className="h-3.5 w-3.5" /></button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {all.map((p, i) => (
+                <tr key={`${p.type}-${p.id}`} className="hover:bg-card/40">
+                  <td className="p-3 px-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border shadow-card overflow-hidden" style={{ background: p.logoBg ?? "transparent" }}>
+                      {p.logoUrl ? <img src={p.logoUrl} alt="" className="h-full w-full object-cover" /> : <Flame className="h-5 w-5 text-foreground" />}
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <div className="font-medium">{p.name}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground">{p.slug}</div>
+                  </td>
+                  <td className="p-3">
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${p.type === "survey" ? "bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/30" : "bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/30"}`}>{p.type}</span>
+                  </td>
+                  <td className="p-3"><Toggle checked={!!p.enabled} onChange={() => toggleEnabled(p)} /></td>
+                  <td className="p-3"><Toggle checked={!!p.isTopOffer} onChange={() => toggleTop(p)} /></td>
+                  <td className="p-3 tabular-nums text-muted-foreground">{p.sortOrder ?? i + 1}</td>
+                  <td className="p-3 px-4">
+                    <div className="inline-flex gap-1">
+                      <button onClick={() => setModal({ ...emptyDraft, ...p })} className="rounded-lg bg-card/60 hover:bg-card p-1.5"><Pencil className="h-3.5 w-3.5" /></button>
+                      <button onClick={() => { if (confirm(`Delete ${p.name}?`)) delMut.mutate({ id: p.id, type: p.type }); }} className="rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 p-1.5"><Trash2 className="h-3.5 w-3.5" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {all.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">No providers yet.</td></tr>}
             </tbody>
           </table>
         </div>
       </div>
 
-      {modal && <ProviderModal draft={modal} onChange={setModal} onClose={() => setModal(null)} />}
+      {modal && <ProviderModal draft={modal} onChange={setModal} onClose={() => setModal(null)} onSave={() => saveMut.mutate(modal)} saving={saveMut.isPending} />}
     </div>
   );
 }
 
-function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (d: Draft) => void; onClose: () => void }) {
+function ProviderModal({ draft, onChange, onClose, onSave, saving }: { draft: Draft; onChange: (d: Draft) => void; onClose: () => void; onSave: () => void; saving: boolean }) {
   const upd = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button onClick={onClose} className="absolute inset-0 bg-background/70 backdrop-blur-md" />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl glass shadow-card animate-page-in">
         <div className="flex items-center justify-between p-5 border-b border-border sticky top-0 bg-card/80 backdrop-blur-xl">
-          <h3 className="font-display text-lg font-bold">{draft.name ? "Edit Provider" : "Add Provider"}</h3>
+          <h3 className="font-display text-lg font-bold">{draft.id ? "Edit Provider" : "Add Provider"}</h3>
           <button onClick={onClose} className="rounded-lg bg-card/60 hover:bg-card p-1.5"><X className="h-4 w-4" /></button>
         </div>
 
         <div className="p-5 grid md:grid-cols-2 gap-4">
           <FormField label="Name">
-            <input value={draft.name} onChange={(e) => { const v = e.target.value; onChange({ ...draft, name: v, slug: v.toLowerCase().replace(/\s+/g, "-") }); }} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
+            <input value={draft.name} onChange={(e) => { const v = e.target.value; onChange({ ...draft, name: v, slug: draft.slug || v.toLowerCase().replace(/\s+/g, "-") }); }} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </FormField>
           <FormField label="Slug">
             <input value={draft.slug} onChange={(e) => upd("slug", e.target.value)} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm font-mono" />
@@ -148,16 +170,6 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
             </div>
           </FormField>
 
-          <FormField label="Upload Logo" full>
-            <label className="flex items-center gap-2 cursor-pointer rounded-xl bg-card/60 border border-dashed border-border px-3 py-2 text-sm hover:bg-card">
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                const f = e.target.files?.[0]; if (!f) return;
-                const r = new FileReader(); r.onload = () => upd("logoUrl", String(r.result)); r.readAsDataURL(f);
-              }} />
-              <span className="text-muted-foreground">Choose image file (PNG, JPG, SVG)…</span>
-            </label>
-          </FormField>
-
           <FormField label="Logo Background">
             <input type="color" value={draft.logoBg} onChange={(e) => upd("logoBg", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
@@ -178,7 +190,6 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
             <input type="color" value={draft.gradTo} onChange={(e) => upd("gradTo", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
 
-
           <FormField label="Badge Text">
             <input value={draft.badgeText} onChange={(e) => upd("badgeText", e.target.value)} placeholder="e.g. NEW, HOT, 2X" maxLength={12} className="w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </FormField>
@@ -186,25 +197,19 @@ function ProviderModal({ draft, onChange, onClose }: { draft: Draft; onChange: (
             <input type="color" value={draft.badgeColor} onChange={(e) => upd("badgeColor", e.target.value)} className="h-10 w-full rounded-xl bg-card/60 border border-border cursor-pointer" />
           </FormField>
 
-          <div className="md:col-span-2 grid grid-cols-2 gap-3">
-            <ToggleRow label="Top Offer" v={draft.isTopOffer} onChange={() => upd("isTopOffer", !draft.isTopOffer)} />
-            <ToggleRow label="Enabled" v={draft.enabled} onChange={() => upd("enabled", !draft.enabled)} />
-          </div>
-
-          <div className="md:col-span-2 rounded-2xl border border-border p-3 overflow-hidden">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Live card preview</div>
-            <div className="relative h-24 rounded-xl flex items-center justify-center font-display font-bold text-lg" style={{ background: `linear-gradient(135deg, ${draft.gradFrom}, ${draft.gradTo})` }}>
-              {draft.badgeText && (
-                <span className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow" style={{ background: draft.badgeColor }}>{draft.badgeText}</span>
-              )}
-              {draft.name || "Provider name"}
-            </div>
-          </div>
+          <label className="md:col-span-2 flex items-center justify-between rounded-2xl bg-card/60 border border-border p-3">
+            <span className="text-sm font-medium">Enabled</span>
+            <Toggle checked={draft.enabled} onChange={() => upd("enabled", !draft.enabled)} />
+          </label>
+          <label className="md:col-span-2 flex items-center justify-between rounded-2xl bg-card/60 border border-border p-3">
+            <span className="text-sm font-medium">Top Offer</span>
+            <Toggle checked={draft.isTopOffer} onChange={() => upd("isTopOffer", !draft.isTopOffer)} />
+          </label>
         </div>
 
         <div className="flex justify-end gap-2 p-5 border-t border-border sticky bottom-0 bg-card/80 backdrop-blur-xl">
           <button onClick={onClose} className="rounded-xl glass px-4 py-2 text-sm">Cancel</button>
-          <button onClick={onClose} className="rounded-xl bg-gradient-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow-primary">Save</button>
+          <button onClick={onSave} disabled={saving} className="rounded-xl bg-gradient-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow-primary disabled:opacity-60">{saving ? "Saving…" : "Save"}</button>
         </div>
       </div>
     </div>
@@ -217,14 +222,5 @@ function FormField({ label, children, full }: { label: string; children: React.R
       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
       <div className="mt-1.5">{children}</div>
     </label>
-  );
-}
-
-function ToggleRow({ label, v, onChange }: { label: string; v: boolean; onChange: () => void }) {
-  return (
-    <div className="flex items-center justify-between rounded-2xl bg-card/60 border border-border p-3">
-      <span className="text-sm font-medium">{label}</span>
-      <Toggle checked={v} onChange={onChange} />
-    </div>
   );
 }

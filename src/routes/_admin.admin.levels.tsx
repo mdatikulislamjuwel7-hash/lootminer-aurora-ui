@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
-import { mockLevels } from "@/data/mock";
+import { adminAPI } from "@/lib/api";
 import { Plus, Save, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/levels")({
@@ -9,11 +11,18 @@ export const Route = createFileRoute("/_admin/admin/levels")({
   component: LevelsPage,
 });
 
-type Row = (typeof mockLevels)[number] & { color: string };
+type Row = { id?: number; level: number; requiredXp: number; bonusXp: number; badge: string; color: string };
 
 function LevelsPage() {
+  const qc = useQueryClient();
   const colors = ["#22d3ee", "#a855f7", "#f59e0b", "#10b981", "#ef4444", "#6366f1", "#ec4899"];
-  const [rows, setRows] = useState<Row[]>(mockLevels.map((l, i) => ({ ...l, color: colors[i % colors.length] })));
+  const { data } = useQuery({ queryKey: ["admin", "levels"], queryFn: adminAPI.levels });
+  const [rows, setRows] = useState<Row[]>([]);
+
+  useEffect(() => {
+    const lv: any[] = data?.levels ?? [];
+    setRows(lv.map((l, i) => ({ ...l, color: l.color ?? colors[i % colors.length] })));
+  }, [data]);
 
   const update = (i: number, k: keyof Row, v: string | number) => {
     setRows(r => r.map((row, idx) => idx === i ? { ...row, [k]: v } : row));
@@ -23,6 +32,12 @@ function LevelsPage() {
     const next = rows.length + 1;
     setRows([...rows, { level: next, requiredXp: next * 1500, bonusXp: 100 + next * 50, badge: "Starter", color: colors[next % colors.length] }]);
   };
+
+  const saveMut = useMutation({
+    mutationFn: (r: Row) => r.id ? adminAPI.editLevel(r.id, r) : adminAPI.editLevel(r.level, r),
+    onSuccess: () => { toast.success("Level saved"); qc.invalidateQueries({ queryKey: ["admin", "levels"] }); },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Save failed"),
+  });
 
   return (
     <div className="space-y-6">
@@ -64,12 +79,13 @@ function LevelsPage() {
                 </td>
                 <td className="p-3 px-4">
                   <div className="inline-flex gap-1">
-                    <button className="rounded-lg bg-success/15 text-success hover:bg-success/25 p-1.5"><Save className="h-3.5 w-3.5" /></button>
-                    <button className="rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 p-1.5"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => saveMut.mutate(r)} disabled={saveMut.isPending} className="rounded-lg bg-success/15 text-success hover:bg-success/25 p-1.5 disabled:opacity-60"><Save className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setRows(rows.filter((_, idx) => idx !== i))} className="rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 p-1.5"><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </td>
               </tr>
             ))}
+            {rows.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">No levels yet.</td></tr>}
           </tbody>
         </table>
       </div>

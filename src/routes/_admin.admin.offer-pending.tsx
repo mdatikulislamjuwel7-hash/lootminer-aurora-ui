@@ -1,53 +1,57 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import { Plus, Trash2, X, ShieldAlert, Check, XCircle } from "lucide-react";
+import { adminAPI } from "@/lib/api";
+import { Plus, Trash2, ShieldAlert, Check, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/offer-pending")({
   head: () => ({ meta: [{ title: "Admin · Offer Pending Rules" }] }),
   component: OfferPendingPage,
 });
 
-type Rule = { id: string; keyword: string; note: string; createdAt: string };
-type PendingLead = {
-  id: string; user: string; offerName: string; network: string;
-  xp: number; matched: string; date: string; status: "Pending" | "Valid" | "Reversed";
-};
-
-const seedRules: Rule[] = [
-  { id: "r1", keyword: "Survey", note: "Manual review for survey completions", createdAt: "2026-05-12" },
-  { id: "r2", keyword: "GameApp", note: "High fraud rate — verify install", createdAt: "2026-05-15" },
-  { id: "r3", keyword: "TikTok", note: "Wait 48h for advertiser confirm", createdAt: "2026-05-18" },
-];
-
-const seedLeads: PendingLead[] = [
-  { id: "l1", user: "alex.j@mail.com", offerName: "Quick Survey Pro", network: "BitLabs", xp: 1200, matched: "Survey", date: "2026-05-22 14:02", status: "Pending" },
-  { id: "l2", user: "miya88", offerName: "GameApp – Reach Level 10", network: "AdGate", xp: 8500, matched: "GameApp", date: "2026-05-22 11:48", status: "Pending" },
-  { id: "l3", user: "rkhan", offerName: "TikTok Install + Watch 60s", network: "OfferToro", xp: 600, matched: "TikTok", date: "2026-05-22 09:11", status: "Pending" },
-  { id: "l4", user: "lina_c", offerName: "Daily Survey Burst", network: "TheoremReach", xp: 450, matched: "Survey", date: "2026-05-21 22:35", status: "Pending" },
-];
-
 function OfferPendingPage() {
-  const [rules, setRules] = useState<Rule[]>(seedRules);
-  const [leads, setLeads] = useState<PendingLead[]>(seedLeads);
+  const qc = useQueryClient();
   const [keyword, setKeyword] = useState("");
   const [note, setNote] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState<Rule | null>(null);
+  const [page, setPage] = useState(1);
 
-  const activeCount = rules.length;
-  const pendingCount = useMemo(() => leads.filter(l => l.status === "Pending").length, [leads]);
+  const { data: rulesData } = useQuery({ queryKey: ["admin", "offer-pending", "rules"], queryFn: adminAPI.offerPendingRules });
+  const { data: leadsData } = useQuery({ queryKey: ["admin", "offer-pending", "leads", page], queryFn: () => adminAPI.pendingLeads(page) });
 
-  const addRule = () => {
-    const k = keyword.trim();
-    if (!k) return;
-    setRules([{ id: crypto.randomUUID(), keyword: k, note: note.trim(), createdAt: new Date().toISOString().slice(0, 10) }, ...rules]);
-    setKeyword(""); setNote("");
-  };
+  const rules: any[] = rulesData?.rules ?? [];
+  const leads: any[] = leadsData?.leads ?? [];
+  const pendingCount = leads.filter(l => l.status === "Pending").length;
 
-  const decide = (id: string, action: "approve" | "reject") => {
-    setLeads(prev => prev.map(l => l.id === id ? { ...l, status: action === "approve" ? "Valid" : "Reversed" } : l));
-  };
+  const addMut = useMutation({
+    mutationFn: () => adminAPI.addOfferPendingRule({ keyword: keyword.trim(), note: note.trim() }),
+    onSuccess: () => {
+      toast.success("Rule added");
+      qc.invalidateQueries({ queryKey: ["admin", "offer-pending", "rules"] });
+      setKeyword(""); setNote("");
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Add failed"),
+  });
+
+  const delMut = useMutation({
+    mutationFn: (id: number) => adminAPI.deleteOfferPendingRule(id),
+    onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["admin", "offer-pending", "rules"] }); },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Delete failed"),
+  });
+
+  const decideMut = useMutation({
+    mutationFn: ({ id, action }: { id: number; action: "approve" | "reject" }) => adminAPI.processPendingLead(id, { action }),
+    onSuccess: () => {
+      toast.success("Lead updated");
+      qc.invalidateQueries({ queryKey: ["admin", "offer-pending", "leads"] });
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: any) => toast.error(e?.response?.data?.message ?? "Failed"),
+  });
+
+  const addRule = () => keyword.trim() && addMut.mutate();
 
   return (
     <div className="space-y-6">
@@ -58,12 +62,11 @@ function OfferPendingPage() {
           <span className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs">
             <span className="h-2 w-2 rounded-full bg-warning shadow-[0_0_10px_oklch(0.78_0.16_88)]" />
             <span className="text-muted-foreground">Active rules</span>
-            <span className="font-display font-bold tabular-nums">{activeCount}</span>
+            <span className="font-display font-bold tabular-nums">{rules.length}</span>
           </span>
         }
       />
 
-      {/* Add Rule Card */}
       <div className="rounded-3xl glass shadow-card p-5">
         <div className="flex items-center gap-2 mb-4">
           <div className="h-9 w-9 rounded-xl bg-gradient-primary shadow-glow-primary flex items-center justify-center">
@@ -78,33 +81,20 @@ function OfferPendingPage() {
         <div className="grid md:grid-cols-[1fr_2fr_auto] gap-3">
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Keyword</span>
-            <input
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addRule()}
-              placeholder='e.g. "Survey", "GameApp", "TikTok"'
-              className="mt-1.5 w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm font-mono"
-            />
+            <input value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addRule()} placeholder='e.g. "Survey", "GameApp", "TikTok"' className="mt-1.5 w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm font-mono" />
           </label>
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Note (optional)</span>
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addRule()}
-              placeholder="Why is this offer pending?"
-              className="mt-1.5 w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm"
-            />
+            <input value={note} onChange={(e) => setNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addRule()} placeholder="Why is this offer pending?" className="mt-1.5 w-full rounded-xl bg-card/60 border border-border px-3 py-2 text-sm" />
           </label>
           <div className="flex items-end">
-            <button onClick={addRule} className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow-primary">
-              <Plus className="h-4 w-4" /> Add Rule
+            <button onClick={addRule} disabled={addMut.isPending} className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow-primary disabled:opacity-60">
+              <Plus className="h-4 w-4" /> {addMut.isPending ? "…" : "Add Rule"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Rules Table */}
       <div className="rounded-3xl glass shadow-card overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="font-display font-bold">Active Rules</h3>
@@ -130,7 +120,7 @@ function OfferPendingPage() {
                   <td className="p-3 text-muted-foreground">{r.note || <span className="opacity-50">—</span>}</td>
                   <td className="p-3 tabular-nums text-muted-foreground">{r.createdAt}</td>
                   <td className="p-3 px-4">
-                    <button onClick={() => setConfirmDelete(r)} className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 px-2.5 py-1.5 text-xs">
+                    <button onClick={() => { if (confirm(`Delete rule "${r.keyword}"?`)) delMut.mutate(r.id); }} className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 px-2.5 py-1.5 text-xs">
                       <Trash2 className="h-3.5 w-3.5" /> Delete
                     </button>
                   </td>
@@ -141,7 +131,6 @@ function OfferPendingPage() {
         </div>
       </div>
 
-      {/* Pending Leads */}
       <div className="rounded-3xl glass shadow-card overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div>
@@ -167,25 +156,25 @@ function OfferPendingPage() {
               )}
               {leads.map((l) => (
                 <tr key={l.id} className="hover:bg-card/40">
-                  <td className="p-3 px-4 font-medium">{l.user}</td>
+                  <td className="p-3 px-4 font-medium">{l.user ?? l.username}</td>
                   <td className="p-3">{l.offerName}</td>
                   <td className="p-3 text-muted-foreground">{l.network}</td>
-                  <td className="p-3 font-display font-bold text-gradient-xp tabular-nums">+{l.xp.toLocaleString()}</td>
-                  <td className="p-3"><span className="font-mono text-xs rounded-md bg-card/60 border border-border px-2 py-0.5">{l.matched}</span></td>
-                  <td className="p-3 tabular-nums text-muted-foreground whitespace-nowrap">{l.date}</td>
+                  <td className="p-3 font-display font-bold text-gradient-xp tabular-nums">+{Number(l.xp).toLocaleString()}</td>
+                  <td className="p-3"><span className="font-mono text-xs rounded-md bg-card/60 border border-border px-2 py-0.5">{l.matched ?? l.matchedKeyword}</span></td>
+                  <td className="p-3 tabular-nums text-muted-foreground whitespace-nowrap">{l.date ?? l.createdAt}</td>
                   <td className="p-3"><StatusBadge status={l.status} /></td>
                   <td className="p-3 px-4">
                     {l.status === "Pending" ? (
                       <div className="inline-flex gap-1">
-                        <button onClick={() => decide(l.id, "approve")} className="inline-flex items-center gap-1 rounded-lg bg-success/15 text-success hover:bg-success/25 px-2.5 py-1.5 text-xs font-semibold">
+                        <button onClick={() => decideMut.mutate({ id: l.id, action: "approve" })} disabled={decideMut.isPending} className="inline-flex items-center gap-1 rounded-lg bg-success/15 text-success hover:bg-success/25 px-2.5 py-1.5 text-xs font-semibold disabled:opacity-60">
                           <Check className="h-3.5 w-3.5" /> Approve
                         </button>
-                        <button onClick={() => decide(l.id, "reject")} className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 px-2.5 py-1.5 text-xs font-semibold">
+                        <button onClick={() => decideMut.mutate({ id: l.id, action: "reject" })} disabled={decideMut.isPending} className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 px-2.5 py-1.5 text-xs font-semibold disabled:opacity-60">
                           <XCircle className="h-3.5 w-3.5" /> Reject
                         </button>
                       </div>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Resolved</span>
+                      <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </td>
                 </tr>
@@ -193,31 +182,12 @@ function OfferPendingPage() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <button onClick={() => setConfirmDelete(null)} className="absolute inset-0 bg-background/70 backdrop-blur-md" />
-          <div className="relative w-full max-w-md rounded-3xl glass shadow-card p-5 animate-page-in">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-display font-bold">Delete rule?</h4>
-              <button onClick={() => setConfirmDelete(null)} className="rounded-lg bg-card/60 hover:bg-card p-1.5"><X className="h-4 w-4" /></button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              The keyword <span className="font-mono font-bold text-foreground">{confirmDelete.keyword}</span> will no longer hold matching postbacks. Existing pending leads remain unchanged.
-            </p>
-            <div className="flex justify-end gap-2 mt-5">
-              <button onClick={() => setConfirmDelete(null)} className="rounded-xl glass px-4 py-2 text-sm">Cancel</button>
-              <button
-                onClick={() => { setRules(rules.filter(r => r.id !== confirmDelete.id)); setConfirmDelete(null); }}
-                className="rounded-xl bg-destructive text-destructive-foreground px-5 py-2 text-sm font-semibold"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+        <div className="flex justify-end gap-1 p-3 border-t border-border">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-lg glass px-3 py-1 text-xs disabled:opacity-40">‹ Prev</button>
+          <span className="rounded-lg bg-gradient-primary text-primary-foreground px-3 py-1 text-xs">{page}</span>
+          <button onClick={() => setPage(p => p + 1)} disabled={leads.length < 50} className="rounded-lg glass px-3 py-1 text-xs disabled:opacity-40">Next ›</button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
