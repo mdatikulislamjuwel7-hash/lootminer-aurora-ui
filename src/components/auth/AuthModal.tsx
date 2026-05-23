@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
-import { signIn } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
 import { Check, Diamond, Flame, Crown, Hexagon, Rocket, Star, Sparkles, Zap } from "lucide-react";
-
 
 const avatars = [
   { id: "diamond", icon: Diamond, color: "from-cyan-400 to-blue-500" },
@@ -21,21 +21,41 @@ export function AuthModal({
   open, mode, onOpenChange,
 }: { open: boolean; mode: "signin" | "signup"; onOpenChange: (v: boolean) => void }) {
   const nav = useNavigate();
+  const { login, register } = useAuth();
   const [tab, setTab] = useState<"signin" | "signup">(mode);
   const [selected, setSelected] = useState("diamond");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    signIn("CrystalMiner", "CM");
-    onOpenChange(false);
-    nav({ to: "/dashboard" });
+    setErr(null); setBusy(true);
+    try {
+      await login(email, password);
+      toast.success("Signed in");
+      onOpenChange(false);
+      nav({ to: "/dashboard" });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || "Sign-in failed";
+      setErr(msg); toast.error(msg);
+    } finally { setBusy(false); }
   };
-  const handleSignUp = (e: React.FormEvent) => {
+
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    signIn(username || "CrystalMiner", (username || "CM").slice(0, 2).toUpperCase());
-    onOpenChange(false);
-    nav({ to: "/dashboard" });
+    setErr(null); setBusy(true);
+    try {
+      await register({ username, email, password, avatar: selected });
+      toast.success("Account created");
+      onOpenChange(false);
+      nav({ to: "/dashboard" });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || "Sign-up failed";
+      setErr(msg); toast.error(msg);
+    } finally { setBusy(false); }
   };
 
   return (
@@ -58,24 +78,22 @@ export function AuthModal({
             </DialogHeader>
 
             <div className="mt-4 inline-flex rounded-xl bg-card/60 p-1 border border-border">
-              <button
-                type="button"
-                onClick={() => setTab("signin")}
+              <button type="button" onClick={() => setTab("signin")}
                 className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${tab === "signin" ? "bg-gradient-primary text-primary-foreground shadow-glow-primary" : "text-muted-foreground"}`}
               >Sign In</button>
-              <button
-                type="button"
-                onClick={() => setTab("signup")}
+              <button type="button" onClick={() => setTab("signup")}
                 className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${tab === "signup" ? "bg-gradient-primary text-primary-foreground shadow-glow-primary" : "text-muted-foreground"}`}
               >Sign Up</button>
             </div>
 
+            {err && <div className="mt-3 rounded-lg bg-destructive/15 px-3 py-2 text-xs text-destructive">{err}</div>}
+
             {tab === "signin" ? (
               <form onSubmit={handleSignIn} className="mt-5 space-y-3">
-                <Field label="Email" type="email" placeholder="you@mail.com" required />
-                <Field label="Password" type="password" placeholder="••••••••" required />
-                <button type="submit" className="w-full rounded-xl bg-gradient-primary py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition">
-                  Sign In
+                <Field label="Email" type="email" placeholder="you@mail.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Field label="Password" type="password" placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <button type="submit" disabled={busy} className="w-full rounded-xl bg-gradient-primary py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition disabled:opacity-60">
+                  {busy ? "Signing in…" : "Sign In"}
                 </button>
               </form>
             ) : (
@@ -88,12 +106,8 @@ export function AuthModal({
                       const Icon = a.icon;
                       const isSel = selected === a.id;
                       return (
-                        <button
-                          key={a.id}
-                          type="button"
-                          onClick={() => setSelected(a.id)}
-                          className={`group relative aspect-square rounded-2xl border transition ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}
-                        >
+                        <button key={a.id} type="button" onClick={() => setSelected(a.id)}
+                          className={`group relative aspect-square rounded-2xl border transition ${isSel ? "border-primary shadow-glow-primary" : "border-border hover:border-primary/50"}`}>
                           <div className={`absolute inset-1 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center`}>
                             <Icon className="h-5 w-5 text-white" />
                           </div>
@@ -108,10 +122,10 @@ export function AuthModal({
                   </div>
                 </div>
                 <Field label="Username" placeholder="CrystalMiner" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                <Field label="Email" type="email" placeholder="you@mail.com" required />
-                <Field label="Password" type="password" placeholder="•••••••• (8+ chars)" required />
-                <button type="submit" className="w-full rounded-xl bg-gradient-primary py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition">
-                  Create Account
+                <Field label="Email" type="email" placeholder="you@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Field label="Password" type="password" placeholder="•••••••• (8+ chars)" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <button type="submit" disabled={busy} className="w-full rounded-xl bg-gradient-primary py-3 text-sm font-semibold text-primary-foreground shadow-glow-primary hover:opacity-95 transition disabled:opacity-60">
+                  {busy ? "Creating…" : "Create Account"}
                 </button>
               </form>
             )}

@@ -8,8 +8,7 @@ import {
   LifeBuoy, Crown, Flame, LogOut, Zap,
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
-import { mockUser } from "@/data/mock";
-import { signOut } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 const links = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -26,6 +25,8 @@ const links = [
 export function NavDrawer({ trigger }: { trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const nav = useNavigate();
+  const { user, logout } = useAuth();
+  const initials = (user?.username ?? "??").slice(0, 2).toUpperCase();
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -48,13 +49,13 @@ export function NavDrawer({ trigger }: { trigger?: React.ReactNode }) {
               <div className="relative">
                 <div className="absolute -inset-0.5 rounded-full bg-gradient-primary blur opacity-60" />
                 <div className="relative flex h-11 w-11 items-center justify-center rounded-full bg-card border border-border font-display font-bold">
-                  {mockUser.avatar}
+                  {initials}
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="truncate font-display text-sm font-semibold">{mockUser.username}</div>
+                <div className="truncate font-display text-sm font-semibold">{user?.username ?? "Guest"}</div>
                 <div className="truncate text-xs text-muted-foreground">
-                  Level {mockUser.level} · <span className="text-gradient-xp font-semibold">{mockUser.balanceXp.toLocaleString()} XP</span>
+                  Level {user?.level ?? 0} · <span className="text-gradient-xp font-semibold">{(user?.balanceXp ?? 0).toLocaleString()} XP</span>
                 </div>
               </div>
               <Zap className="h-4 w-4 text-xp" />
@@ -78,7 +79,7 @@ export function NavDrawer({ trigger }: { trigger?: React.ReactNode }) {
 
           <button
             type="button"
-            onClick={() => { setOpen(false); signOut(); nav({ to: "/" }); }}
+            onClick={() => { setOpen(false); logout(); nav({ to: "/" }); }}
             className="mt-6 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition"
           >
             <LogOut className="h-4 w-4" /> Logout
