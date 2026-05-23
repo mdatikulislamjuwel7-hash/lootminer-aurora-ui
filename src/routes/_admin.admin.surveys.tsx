@@ -12,18 +12,20 @@ export const Route = createFileRoute("/_admin/admin/surveys")({
 
 type Draft = {
   name: string; slug: string;
-  logoUrl: string; logoBg: string;
+  logoUrl: string; logoBg: string; logoSize: number;
   iframeUrl: string;
   gradFrom: string; gradTo: string;
   isTopOffer: boolean; enabled: boolean; sortOrder: number;
+  cardPosition: number;
 };
 
 const emptyDraft: Draft = {
   name: "", slug: "",
-  logoUrl: "", logoBg: "#7c3aed",
+  logoUrl: "", logoBg: "#7c3aed", logoSize: 40,
   iframeUrl: "",
   gradFrom: "#a855f7", gradTo: "#6366f1",
   isTopOffer: false, enabled: true, sortOrder: 0,
+  cardPosition: 1,
 };
 
 function SurveysPage() {
