@@ -265,7 +265,9 @@ export const mockSettings = {
   signupOpen: true,
   vpnBlocking: true,
   fraudlogix: false,
+  fraudlogixKey: "",
   ipqs: false,
+  ipqsKey: "",
   proxyChangeDetect: true,
 };
 
