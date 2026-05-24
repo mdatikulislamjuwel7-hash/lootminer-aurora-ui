@@ -36,7 +36,10 @@ export const publicAPI = {
   stats: () => api.get("/public/stats").then((r) => r.data),
   leads: () => api.get("/public/leads").then((r) => r.data),
   offerwalls: () => api.get("/public/offerwalls").then((r) => r.data),
-  settings: () => api.get("/public/settings").then((r) => r.data),
+  settings: () => api.get("/public/settings", {
+    params: { t: Date.now() },
+    headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+  }).then((r) => r.data),
 };
 
 export const userAPI = {

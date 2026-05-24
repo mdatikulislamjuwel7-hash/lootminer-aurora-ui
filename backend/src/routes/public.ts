@@ -1,7 +1,12 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import { prisma } from '../config/database';
 
 const router = Router();
+
+const isLocalRequest = (req: Request) => {
+  const origin = req.get('origin') || req.get('referer') || '';
+  return /https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?/i.test(origin);
+};
 
 router.get('/stats', async (_req, res) => {
   const [totalUsers, totalXpAgg, totalOffers] = await Promise.all([
@@ -37,10 +42,12 @@ router.get('/offerwalls', async (_req, res) => {
   res.json({ items });
 });
 
-router.get('/settings', async (_req, res) => {
+router.get('/settings', async (req, res) => {
+  res.set('Cache-Control', 'no-store, max-age=0');
   const items = await prisma.setting.findMany({ where: { key: { in: ['maintenance_mode', 'live_leads_enabled'] } } });
   const out: Record<string, boolean> = {};
   for (const s of items) out[s.key] = s.value === 'true' || s.value === '1';
+  if (isLocalRequest(req)) out.maintenance_mode = false;
   res.json(out);
 });
 
