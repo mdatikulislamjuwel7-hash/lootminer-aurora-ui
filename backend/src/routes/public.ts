@@ -3,10 +3,18 @@ import { prisma } from '../config/database';
 
 const router = Router();
 
-const isLocalRequest = (req: Request) => {
-  const origin = req.get('origin') || req.get('referer') || '';
-  return /https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?/i.test(origin);
-};
+const isLocalAddress = (value?: string) =>
+  (value || '')
+    .split(',')
+    .map((part) => part.trim().replace(/^https?:\/\//i, ''))
+    .some((part) => {
+      if (part.startsWith('[::1]') || part === '::1') return true;
+      const host = part.split('/')[0].split(':')[0];
+      return ['localhost', '127.0.0.1', '0.0.0.0'].includes(host);
+    });
+
+const isLocalRequest = (req: Request) =>
+  [req.get('origin'), req.get('referer'), req.get('host'), req.get('x-forwarded-host')].some(isLocalAddress);
 
 router.get('/stats', async (_req, res) => {
   const [totalUsers, totalXpAgg, totalOffers] = await Promise.all([
