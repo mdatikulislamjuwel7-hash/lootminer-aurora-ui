@@ -38,7 +38,7 @@ function Landing() {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const open = (m: "signin" | "signup") => { setAuthMode(m); setAuthOpen(true); };
   const isEnabled = (value: unknown) => value === true || value === "true" || value === 1 || value === "1";
-  const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  const isLocalDev = import.meta.env.DEV || (typeof window !== "undefined" && ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(window.location.hostname));
 
   const statsQ = useQuery({ queryKey: ["public-stats"], queryFn: publicAPI.stats });
   const settingsQ = useQuery({ queryKey: ["public-settings"], queryFn: publicAPI.settings });
