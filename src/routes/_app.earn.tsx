@@ -8,6 +8,12 @@ import type { ApiProvider } from "@/lib/types";
 import { SkeletonCard, EmptyState } from "@/components/common/SkeletonCard";
 import { Search, Sparkles, ListChecks } from "lucide-react";
 
+const providersFromResponse = (data: unknown, key: "offerwalls" | "surveys", type: ApiProvider["type"]) => {
+  const value = data as { items?: ApiProvider[]; offerwalls?: ApiProvider[]; surveys?: ApiProvider[] } | ApiProvider[] | undefined;
+  const list = Array.isArray(value) ? value : (value?.[key] ?? value?.items ?? []);
+  return Array.isArray(list) ? list.map((p) => ({ ...p, type })) : [];
+};
+
 export const Route = createFileRoute("/_app/earn")({
   head: () => ({ meta: [{ title: "Earn — LootMiner" }] }),
   component: Earn,
@@ -18,12 +24,8 @@ function Earn() {
   const offerwallsQ = useQuery({ queryKey: ["earn-offerwalls"], queryFn: earnAPI.offerwalls });
   const surveysQ = useQuery({ queryKey: ["earn-surveys"], queryFn: earnAPI.surveys });
 
-  const offerwalls: ApiProvider[] = (offerwallsQ.data?.offerwalls ?? offerwallsQ.data ?? []).map(
-    (p: ApiProvider) => ({ ...p, type: "offerwall" as const }),
-  );
-  const surveys: ApiProvider[] = (surveysQ.data?.surveys ?? surveysQ.data ?? []).map(
-    (p: ApiProvider) => ({ ...p, type: "survey" as const }),
-  );
+  const offerwalls = providersFromResponse(offerwallsQ.data, "offerwalls", "offerwall");
+  const surveys = providersFromResponse(surveysQ.data, "surveys", "survey");
 
   const ql = q.trim().toLowerCase();
   const filter = (list: ApiProvider[]) =>
