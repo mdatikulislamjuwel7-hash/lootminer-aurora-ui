@@ -38,6 +38,7 @@ function Landing() {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const open = (m: "signin" | "signup") => { setAuthMode(m); setAuthOpen(true); };
   const isEnabled = (value: unknown) => value === true || value === "true" || value === 1 || value === "1";
+  const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
   const statsQ = useQuery({ queryKey: ["public-stats"], queryFn: publicAPI.stats });
   const settingsQ = useQuery({ queryKey: ["public-settings"], queryFn: publicAPI.settings });
@@ -48,7 +49,7 @@ function Landing() {
   const partnersRaw = partnersQ.data?.items ?? partnersQ.data?.offerwalls ?? partnersQ.data ?? [];
   const partners: ApiProvider[] = (Array.isArray(partnersRaw) ? partnersRaw : []).slice(0, 8);
 
-  if (isEnabled(settings.maintenance_mode)) {
+  if (!isLocalDev && settingsQ.isSuccess && isEnabled(settings.maintenance_mode)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md rounded-3xl glass p-8 text-center shadow-card">
